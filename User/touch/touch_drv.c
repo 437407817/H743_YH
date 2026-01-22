@@ -308,17 +308,21 @@ return false;
 {	
 //HAL_I2C_ResetBus(&hi2c1);
 	uint16_t i;
+	static uint32_t read_count = 0;
+read_count++;
 	        if (HAL_I2C_GetState(&I2C_Handle) != HAL_I2C_STATE_READY)
         {
             I2Cx_Reset(I2C_Handle);
-					SYSTEM_DEBUG(" I2Cx_Reset ");
+					
+					
         }
 	i=HAL_I2C_Mem_Read(&I2C_Handle,TOUCH_DEV_ADDR,reg,2,pBuffer,numToRead,1000);
 if(i==0){
 return true;
 }
-
-SYSTEM_DEBUG(" HAL_I2C_Mem_Read error£¬read again");
+SYSTEM_BIGNUM_DEC(1,read_count,"  HAL_I2C_Mem_Read error,read again ");
+read_count=0;
+//SYSTEM_DEBUG(" HAL_I2C_Mem_Read error£¬read again");
 I2C_Recover_Bus_Stuck(&I2C_Handle);
 	i=HAL_I2C_Mem_Read(&I2C_Handle,TOUCH_DEV_ADDR,reg,2,pBuffer,numToRead,1000);
 if(i==0){

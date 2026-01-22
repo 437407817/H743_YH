@@ -1595,6 +1595,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\fonts\font24.c</FilePath>
             </File>
+            <File>
+              <FileName>user_buffers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\buffer\user_buffers.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1769,6 +1774,11 @@
               <FileName>frtos_printf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Middlewares\Third_Party_user\freertosutil\rtosprintf\frtos_printf.c</FilePath>
+            </File>
+            <File>
+              <FileName>Task_check.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Middlewares\Wmap_lib\TaskTest\Task_check.c</FilePath>
             </File>
           </Files>
         </Group>

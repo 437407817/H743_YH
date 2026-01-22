@@ -1875,6 +1875,14 @@ void shellWriteEndLine(Shell *shell, char *buffer, int len)
 
 #include "shell.h"
 #include "./rtosprintf/frtos_printf.h"
+#include "./buffer/user_buffers.h"
+
+//#define RX_BUF_SIZE 64
+//extern uint8_t rx_ring[RX_BUF_SIZE];
+//extern  volatile uint8_t rx_head , rx_tail ;
+extern ShellRingBuffer_t shellRingBuffer;
+static uint8_t ch;
+//#include "./sys/sysio.h"
 /**
  * @brief shell 任务
  * 
@@ -1897,8 +1905,17 @@ void shellTask(void *param)
         {
             shellHandler(shell, data);
         }
+			
 #else			
-			vTaskDelay(pdMS_TO_TICKS(100)); // 关键：释放 CPU 给同级或低优先级任务
+        if (RingBuffer_ReadByte(&shellRingBuffer.shell_rx_ring, &ch)) {
+            shellHandler(shell, ch); // 安全！在任务上下文中执行
+        } else {
+         
+					vTaskDelay(pdMS_TO_TICKS(100));
+        }
+			
+//			SYSTEM_INFO("*");
+			 // 关键：释放 CPU 给同级或低优先级任务
 #endif
 
 #if SHELL_TASK_WHILE == 1

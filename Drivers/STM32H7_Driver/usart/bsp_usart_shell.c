@@ -86,7 +86,7 @@ void USART_Shell_UartInit(void)
 		
 		
     /* H743：中断优先级必须低 */
-    HAL_NVIC_SetPriority(USART_SHELL_IRQ, 10, 0);
+    HAL_NVIC_SetPriority(USART_SHELL_IRQ, 5, 0);
     HAL_NVIC_EnableIRQ(USART_SHELL_IRQ);
 		
 		 

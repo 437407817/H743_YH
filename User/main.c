@@ -24,7 +24,7 @@
 #include "freerotspro.h"  
 #include "./sys/sysio.h"
 #include "./DataCache/data_stack.h"
-#include "./sys/sysio.h"
+
 
 #define NVIC_VTOR_MASK       0x3FFFFF80
 #define APP_START_ADDR        0x08004000
@@ -57,6 +57,8 @@ stack_init_marker();// 初始化栈监控,必须放main中，否则跳出方法后卡死
 //	stack_fill(); // 初始化时填充栈（必须在其他函数调用前执行）
 	//ota_app_vtor_reconfig();
 //__enable_irq();
+	// 在系统初始化（SystemClock_Config）后添加
+
 	
   ALL_Init_cfg();
 	    // 打印各总线频率

@@ -15,6 +15,8 @@
 #ifdef SHELL_CFG_USER
 #include SHELL_CFG_USER
 #endif
+#include "./user_config.h"
+
 
 #ifndef SHELL_TASK_WHILE
 /**
@@ -165,6 +167,12 @@
 #define     SHELL_PRINT_BUFFER          128
 #endif /** SHELL_PRINT_BUFFER */
 
+#if USE_OS
+#define     SHELL_SCAN_BUFFER          1
+#else
+#define     SHELL_SCAN_BUFFER          0
+#endif
+
 #ifndef SHELL_SCAN_BUFFER
 /**
  * @brief shell格式化输入的缓冲大小
@@ -191,6 +199,14 @@
 #define     SHELL_USING_LOCK            1
 #endif /** SHELL_USING_LOCK */
 
+
+#if USE_OS
+#define     SHELL_MALLOC(size)          pvPortMalloc(size)
+#else
+#define     SHELL_MALLOC(size)         malloc(size)
+#endif
+
+
 #ifndef SHELL_MALLOC
 /**
  * @brief shell内存分配
@@ -198,6 +214,15 @@
  */
 #define     SHELL_MALLOC(size)          0
 #endif /** SHELL_MALLOC */
+
+
+#if USE_OS
+#define  SHELL_FREE(obj)          vPortFree(obj)
+#else
+#define  SHELL_FREE(obj)     			free(obj)
+#endif
+
+
 
 #ifndef SHELL_FREE
 /**

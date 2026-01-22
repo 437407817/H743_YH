@@ -239,7 +239,7 @@ void vLvglTask(void *pvParameters)
 #include "log.h"
 
 
-
+#include "./TaskTest/Task_check.h"
 
 #include "stdarg.h"
 
@@ -256,6 +256,10 @@ static void T_1_Task(void* parameter)
 		SYSTEM_I_PRINT("Task is running, count: %d", count++);
 		taskYIELD();
 		SYSTEM_D_PRINT("Task is running, count: %d", count++);
+		
+		Check_Usart1_enable();
+		Check_Usart1_clock_enable();
+		
 //		printf("xxxxxx\r\n");
 		 SYSTEM_DEBUG(" T_1_Task !\r\n");
     vTaskDelay(8000/portTICK_PERIOD_MS);   /* ÑÓÊ±1000¸öms */

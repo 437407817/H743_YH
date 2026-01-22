@@ -90,6 +90,7 @@
 ////#include "./dma/bsp_dma2d.h"
 //#include "./touch/touch_drv.h"
 
+#include "./buffer/user_buffers.h"
 
 
 
@@ -114,6 +115,9 @@ DWT_Init();
 	
 
 	DWT_Delay_ms(1000);
+	
+	 user_all_buffer_create();
+	
 	SEGGER_RTT_Init();SYSTEM_INFO("SEGGER_RTT_Init over------------- \n");	
 	USART_Shell_ComDrvInit();SYSTEM_DEBUG("USART_Shell_ComDrvInit over\n");
 #if	1

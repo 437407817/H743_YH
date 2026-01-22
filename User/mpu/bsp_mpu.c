@@ -105,7 +105,9 @@ void mpu_init(void){
   /* 配置 MPU */
   Board_MPU_Config(0, MPU_Normal_WT, SDRAM_BANK_ADDR, MPU_32MB);
   Board_MPU_Config(1, MPU_Normal_WT, 0x24000000, MPU_512KB);
-  
+	
+//  SCB_DisableICache();  // 禁用指令Cache
+//	SCB_DisableDCache();  // 禁用数据Cache
   SCB_EnableICache();    // 使能指令 Cache
   SCB_EnableDCache();    // 使能数据 Cache
 

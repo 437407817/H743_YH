@@ -20,7 +20,7 @@
 #include "./usart/bsp_usart_dma.h"
 #include "./usart/bsp_usart_shell.h"
 #include "./usart/bsp_usart.h"
-
+ #include "./shell_port.h"
 
 
 
@@ -38,9 +38,14 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 #endif
 	
 #endif
-		if(huart == &huart_shell_Handle){
-	HAL_UART_Shell_RxCpltCallback();
+//	SYSTEM_INFO("-");
+	#if USE_LETTER_SHELL&&USE_OS
+	if(huart == &huart_shell_Handle){
+//		SYSTEM_INFO("*");
+	HAL_UART_Shell_RxCpltCallback(huart);
 	}
+	#endif
+	
 #if USE_UARTx_DMA&&USE_UART_DMA_RX
 if (huart == &huart_DMA_Handle) {
 HAL_USARTx_DMA_RxCpltCallback();
@@ -66,12 +71,17 @@ HAL_USARTx_DMA_TxCpltCallback();
 
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
-#if USE_UARTx_DMA
+#if USE_UARTx_DMA&&!USE_LETTER_SHELL&&!USE_OS
 if (huart == &huart_DMA_Handle) {
 	HAL_USARTx_DMA_ErrorCallback();
   }
 #endif
-	
+	SYSTEM_INFO("--------------------err-------------------");
+	#if USE_LETTER_SHELL&&USE_OS
+	if(huart == &huart_shell_Handle){
+	HAL_UART_Shell_ErrorCallback(huart);
+	}
+	#endif
 }
 
 

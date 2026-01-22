@@ -17,14 +17,15 @@
 //#include "usart.h"
 //#include "cevent.h"
 #include "log.h"
-#include "./usart/bsp_usart_shell.h"
+
  #include "./buffer/que.h"
  #include "semphr.h"
 #include "./user_config.h"
 #include "cmsis_os.h"
 
  #include "./sys/sysio.h"
- 
+ #include "./buffer/user_buffers.h"
+
 Shell shell;
 char shellBuffer[512];
 
@@ -56,27 +57,68 @@ void userLogWrite(char *buffer, short len) {
 }
 
 uint8_t my_uartshell_redata;
+
+extern ShellRingBuffer_t shellRingBuffer;
+HAL_StatusTypeDef RIT_Status;
+
 #if (USE_LETTER_SHELL&&USE_OS)
 
 
 void USART_SHELL_IRQHandler(void)
 {
-
+//SYSTEM_INFO("+");
 HAL_UART_IRQHandler(&huart_shell_Handle);	
 }
 //CEVENT_EXPORT(EVENT_INIT_STAGE2, LetterShell_OS_Init);
 //串口收到数据回调
 void HAL_UART_Shell_RxCpltCallback(UART_HandleTypeDef *huart){
-    if(huart->Instance == USART_SHELL)//判断串口号
+    if(huart_shell_Handle.Instance == USART_SHELL)//判断串口号
     {
-        //发送
-		//HAL_UART_Transmit(&huart1,&my_uart1_redata,1,100);
-		shellHandler(&shell, my_uartshell_redata);
-        
-        //开启一次中断
-        HAL_UART_Receive_IT(&huart_shell_Handle,(uint8_t *)&my_uartshell_redata,1);
+
+
+//					SYSTEM_INFO("%c",my_uartshell_redata);
+				RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring,my_uartshell_redata);
+        // 重启接收
+				    while(HAL_UART_Receive_IT(&huart_shell_Handle, (uint8_t *)&my_uartshell_redata, 1)!= HAL_OK){
+      huart_shell_Handle.RxState = HAL_UART_STATE_READY;
+							SYSTEM_INFO(" RIT BUSY = %d \r\n",RIT_Status);
+      __HAL_UNLOCK(&huart_shell_Handle);
+    }
+
+
     }
 }
+
+
+/**
+ * @brief 串口错误回调（必须实现，避免错误状态累积）
+ */
+void HAL_UART_Shell_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART_SHELL) {
+        // 1. 读取错误类型（可选）
+        uint32_t error_code = huart->ErrorCode;
+        
+        // 2. 清除所有错误标志（关键步骤！）
+        // 注意：不同 HAL 版本 API 不同
+        
+        // 方法 A：使用宏（推荐，适用于 STM32H7 新版 HAL）
+        __HAL_UART_CLEAR_FLAG(huart, UART_CLEAR_OREF | UART_CLEAR_NEF | UART_CLEAR_FEF);
+
+        // 方法 B：手动读 RDR + 清 SR（兼容旧版）
+        // volatile uint32_t tmp = huart->Instance->RDR; // 强制清 ORE
+        // (void)tmp;
+
+        // 3. 重置错误码
+        huart->ErrorCode = HAL_UART_ERROR_NONE;
+
+        // 4. 重启接收
+        HAL_UART_Receive_IT(huart, (uint8_t *)&my_uartshell_redata, 1);
+
+        SYSTEM_INFO("UART ORE Recovered! Err=0x%lX\r\n", error_code);
+    }
+}
+
 #endif
 
 
@@ -174,7 +216,10 @@ int userShellUnlock(Shell *shell)
  */
 void LetterShell_OS_Init(void)
 {
+		// 在 UART 初始化后，添加：
+__HAL_UART_ENABLE_IT(&huart_shell_Handle, UART_IT_ERR);
 	HAL_UART_Receive_IT(&huart_shell_Handle,(uint8_t *)&my_uartshell_redata,1);
+
     shellMutex = xSemaphoreCreateMutex();
 
     shell.write = userShellWrite;
