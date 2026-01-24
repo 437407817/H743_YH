@@ -89,7 +89,11 @@ SYSTEM_INFO("+");
          my_uartshell_redata = huart_shell_Handle.Instance->RDR;
         // 发送到消息队列（复杂处理放任务中，回调只做最小操作）
 //        xQueueSendFromISR(uart_rx_queue, &recv_data, NULL);
-        RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring,my_uartshell_redata);
+
+			 RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring,my_uartshell_redata);
+//				shellHandler(&shell, my_uartshell_redata);
+
+			
         // 确保 RXNEIE 位始终开启（关键：防止被静默错误关闭）
         huart_shell_Handle.Instance->CR1 |= USART_CR1_RXNEIE;
         return;
@@ -191,26 +195,26 @@ void HAL_UART_Shell_ErrorCallback(UART_HandleTypeDef *huart)
 
 
 
-#if (USE_LETTER_SHELL&&!USE_OS)
-void USART_SHELL_IRQHandler(void){
+//#if (USE_LETTER_SHELL&&!USE_OS)
+//void USART_SHELL_IRQHandler(void){
 
-	HAL_UART_IRQHandler(&huart_shell_Handle);	
-}
+//	HAL_UART_IRQHandler(&huart_shell_Handle);	
+//}
 
-void HAL_UART_Shell_RxCpltCallback(void)
-{
-#if USE_OS
-        osSignalSet(thread_shellTaskHandle, 0x01);
-#endif
-//	osThreadFlagsSet(thread_shellTaskHandle, 0x01);
-//SYSTEM_DEBUG("111%c",ch);
-//		 InQue(rx_letter_shell_que, ch);
-	shellHandler(&shell, ch);
+//void HAL_UART_Shell_RxCpltCallback(void)
+//{
+//#if USE_OS
+//        osSignalSet(thread_shellTaskHandle, 0x01);
+//#endif
+////	osThreadFlagsSet(thread_shellTaskHandle, 0x01);
+////SYSTEM_DEBUG("111%c",ch);
+////		 InQue(rx_letter_shell_que, ch);
+//	shellHandler(&shell, ch);
 
-		HAL_UART_Receive_IT(&huart_shell_Handle, (uint8_t*)&ch, 1);
+//		HAL_UART_Receive_IT(&huart_shell_Handle, (uint8_t*)&ch, 1);
 
-}
-#endif
+//}
+//#endif
 
 /**
  * @brief 用户shell写
@@ -307,34 +311,93 @@ __HAL_UART_ENABLE_IT(&huart_shell_Handle, UART_IT_ERR);
     }
 }
 
+//#include "ringbuffer.h"  // 确保包含环形缓冲区的头文件
 
+// 声明环形缓冲区实例（需和中断中使用的是同一个）
+//extern RingBuffer_t shellRingBuffer;
+    unsigned short read_count = 0;  // 实际读取字节数
+    uint8_t read_byte;              // 临时存储读取的单个字节
+/**
+ * @brief 从shell环形缓冲区读取数据
+ * @param data 存储读取数据的缓冲区
+ * @param len 期望读取的最大字节数
+ * @return 实际读取到的字节数
+ */
+short userShellRead(char *data, unsigned short len)
+{
+    // 入参合法性检查
+    if (data == NULL || len == 0)
+    {
+        return 0;
+    }
+read_count=0;
+//        if (RingBuffer_ReadByte(&shellRingBuffer.shell_rx_ring, &read_byte) == true)
+//        {
+//            data[read_count] = (char)read_byte;  // 存入数据缓冲区
+//            read_count++;                        // 计数+1
+//					SYSTEM_INFO("%c",read_byte);
+//        }
+
+    // 循环读取：直到读满len个字节 或 缓冲区为空
+//    while (len>0)
+//    {
+//        // 从环形缓冲区读取一个字节
+//        // RingBuffer_ReadByte返回值一般为0表示成功，非0表示空/失败
+//        if (RingBuffer_ReadByte(&shellRingBuffer.shell_rx_ring, &read_byte) == true)
+//        {
+//            data[read_count] = (char)read_byte;  // 存入数据缓冲区
+//            read_count++;                        // 计数+1
+//        }
+//        else
+//        {
+//            break;  // 缓冲区无数据，退出循环
+//        }
+//    }
+        if (RingBuffer_ReadByte(&shellRingBuffer.shell_rx_ring, &read_byte) == true)
+        {
+            *data = (char)read_byte;  // 存入数据缓冲区
+            read_count++;                        // 计数+1
+        }
+
+    // 返回实际读取的字节数
+    return read_count;
+}
 
 void letterShell_no_os_WhileInit(void)
 {
+	
 	//注册自己实现的写函数
   shell.write = userShellWrite;
-	#if (USE_LETTER_SHELL&&!USE_OS)
-//	shell.read = userShellRead;
-	#endif
+	
+	shell.read = userShellRead;
+	
+
 	//调用shell初始化函数
     shellInit(&shell, shellBuffer, 512);
+	logRegister(&userLog, &shell);
 //	__HAL_UART_CLEAR_NEFLAG(&huart_shell_Handle);
 //volatile uint32_t temp_isr = huart_shell_Handle.Instance->ISR;  // 先读 ISR 寄存器(必须有)
 //		(void)temp_isr;
-	__HAL_UART_ENABLE_IT(&huart_shell_Handle,UART_IT_RXNE);
+//	__HAL_UART_ENABLE_IT(&huart_shell_Handle,UART_IT_RXNE);
+	HAL_UART_Receive_IT(&huart_shell_Handle,(uint8_t *)&my_uartshell_redata,1);
 }
 
 void letter_Shell_NoOsWhileTask(void)
 {
     Shell *tshell = &shell;
-    char data;
+    uint8_t data;
 
-    while(1)
+//    while(1)
     {
         if (tshell->read && tshell->read(&data, 1) == 1)
         {
             shellHandler(tshell, data);
         }
+			
+//        if (RingBuffer_ReadByte(&shellRingBuffer.shell_rx_ring, &data))
+//        {
+//            shellHandler(tshell, data);
+//        }
     }
 }
 

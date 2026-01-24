@@ -29,7 +29,7 @@
 
 
 
-#define USE_FREERTOS                    1 //¿ªÆôfreertos
+#define USE_FREERTOS                    0 //¿ªÆôfreertos
 
 
 /* Exported types ------------------------------------------------------------*/
@@ -60,7 +60,7 @@
 #if USE_OS
 #define USE_LETTER_SHELL 1
 #else
-#define USE_LETTER_SHELL 0
+#define USE_LETTER_SHELL 1
 #endif
 
 

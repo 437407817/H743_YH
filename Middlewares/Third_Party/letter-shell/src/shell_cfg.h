@@ -24,7 +24,12 @@
  *        使能此宏，则`shellTask()`函数会一直循环读取输入，一般使用操作系统建立shell
  *        任务时使能此宏，关闭此宏的情况下，一般适用于无操作系统，在主循环中调用`shellTask()`
  */
+ #if (USE_OS)
 #define     SHELL_TASK_WHILE            1
+#else
+#define     SHELL_TASK_WHILE            0  //无os则必须为0
+#endif
+
 #endif /** SHELL_TASK_WHILE */
 
 #ifndef SHELL_USING_CMD_EXPORT
@@ -196,7 +201,11 @@
  * @brief 使用锁
  * @note 使用shell锁时，需要对加锁和解锁进行实现
  */
+#if (USE_OS)
 #define     SHELL_USING_LOCK            1
+#else
+#define     SHELL_USING_LOCK            0  //无os则必须为0
+#endif
 #endif /** SHELL_USING_LOCK */
 
 

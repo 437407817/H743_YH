@@ -29,17 +29,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 //  if (huart == &huart_a) {
 //    HAL_UART_a_RxCpltCallback();
 //  }else 
-#if !USE_OS	
-#if TEST_SHELL_UART||USE_LETTER_SHELL
-	if(huart == &huart_shell_Handle){
-	HAL_UART_Shell_RxCpltCallback();
-	}
-	
-#endif
-	
-#endif
+
 //	SYSTEM_INFO("-");
-	#if USE_LETTER_SHELL&&USE_OS
+	#if USE_LETTER_SHELL
 	if(huart == &huart_shell_Handle){
 //		SYSTEM_INFO("*");
 	HAL_UART_Shell_RxCpltCallback(huart);

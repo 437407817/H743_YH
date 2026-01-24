@@ -62,7 +62,7 @@ TaskComps_t g_taskComps[] =
 		  {0, 2000,   200,  Disable,10,Handle_DMA_USART_Send},  //多任务测试效果最佳
 		#endif
 		 
-		 #if USE_LETTER_SHELL&&!USE_OS
+		 #if USE_LETTER_SHELL&&(!USE_OS)
 		 {0, 200,   200,  Disable,10,Handle_letter_Shell_NoOsWhile},	
 		 #endif
 		 
