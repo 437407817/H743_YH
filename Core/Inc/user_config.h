@@ -29,7 +29,7 @@
 
 
 
-#define USE_FREERTOS                    0 //¿ªÆôfreertos
+#define USE_FREERTOS                    1 //¿ªÆôfreertos
 
 
 /* Exported types ------------------------------------------------------------*/
@@ -41,14 +41,14 @@
 
 
 #define USE_LVGL 1
-#define USE_LVGL_OS 1
+
 
 #ifndef USE_OS
 #define USE_OS  0
-
+#define USE_LVGL_OS 0
 #else
 
-
+#define USE_LVGL_OS 1
 #endif
 
 

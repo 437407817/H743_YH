@@ -1883,6 +1883,9 @@ void shellWriteEndLine(Shell *shell, char *buffer, int len)
 extern ShellRingBuffer_t shellRingBuffer;
 static uint8_t ch;
 //#include "./sys/sysio.h"
+#include "FreeRTOS.h"
+#include "task.h"
+ #include "./shell_port.h"
 /**
  * @brief shell 任务
  * 
@@ -1893,6 +1896,7 @@ void shellTask(void *param)
 {
     Shell *shell = (Shell *)param;
     char data;
+	uint16_t rx;
 #if SHELL_TASK_WHILE == 1
 	#if (USE_OS)
 	SYSTEM_set_rtosShell_running();
@@ -1907,14 +1911,28 @@ void shellTask(void *param)
         }
 			
 #else			
-        if (RingBuffer_ReadByte(&shellRingBuffer.shell_rx_ring, &ch)) {
-            shellHandler(shell, ch); // 安全！在任务上下文中执行
-        } else {
-         
-					vTaskDelay(pdMS_TO_TICKS(100));
-        }
 			
-//			SYSTEM_INFO("*");
+if (userShellMutexUnlock() == 1){
+	
+	rx=0;
+
+	
+
+	
+	do{
+		if(rx){
+		shellHandler(shell, ch);
+		}
+	
+//			taskENTER_CRITICAL(); 
+	rx=RingBuffer_ReadByte(&shellRingBuffer.shell_rx_ring, &ch);
+//		taskEXIT_CRITICAL();
+	}while(rx);
+	 
+
+}			
+vTaskDelay(pdMS_TO_TICKS(100));
+			SYSTEM_INFO("*");
 			 // 关键：释放 CPU 给同级或低优先级任务
 #endif
 

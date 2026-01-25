@@ -49,7 +49,7 @@
 #include "./TaskTest/Task_check.h"
 //#include "./usart/bsp_usart.h"
 #include "./SEGGER_TOOLKIT.h"
-
+#include "./sys/bsp_systime.h"   
 
 /******************************* 宏定义 ************************************/
 /*
@@ -162,7 +162,7 @@ static void AppTaskCreate(void)
   
   taskENTER_CRITICAL();           //进入临界区
     /* 创建Test_Queue */
-
+SYSTEM_set_rtos_running();
 
 //  if(NULL != Test_Queue)
 //    printf("创建Test_Queue消息队列成功!\r\n");
@@ -241,7 +241,17 @@ vPrintStack_TaskCreationResult("SEGGERTask", xReturn, 256);
   taskEXIT_CRITICAL();            //退出临界区
 }
 
+void StartNeedDeleteTask(void *pvParameters)
+{
 
+
+    
+    while(1)
+    {
+
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}
 /**
  * @brief       LVGL运行例程
  * @param       pvParameters : 传入参数(未用到)

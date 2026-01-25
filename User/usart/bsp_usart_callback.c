@@ -68,7 +68,7 @@ if (huart == &huart_DMA_Handle) {
 	HAL_USARTx_DMA_ErrorCallback();
   }
 #endif
-	SYSTEM_INFO("--------------------err-------------------");
+	SYSTEM_INFO("\r\n--------------------err-------------------\r\n");
 	#if USE_LETTER_SHELL&&USE_OS
 	if(huart == &huart_shell_Handle){
 	HAL_UART_Shell_ErrorCallback(huart);

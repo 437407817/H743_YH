@@ -76,8 +76,8 @@ void Delay_Us_NoTask( __IO uint32_t us);
 
 
 
-//Delay_Ms_NoTask(ms);}\
-
+//Delay_Ms_NoTask(ms);}
+void SYSTEM_set_rtos_running(void);
 
 void delay_us_soft(uint32_t delay_us);
 

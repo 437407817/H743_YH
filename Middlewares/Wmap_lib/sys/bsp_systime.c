@@ -22,12 +22,15 @@
 #include "./core_cm7.h" 
 #include "./Sys/sys_dwt.h"
 //******************************
-__IO uint32_t NowUse_rtos_delay = 0;
+__IO uint32_t NowUse_rtos = 0;
 
-
+void SYSTEM_set_rtos_running(void)
+{
+    NowUse_rtos = 1;
+}
 
 void delay_ms(uint32_t ms){
-if(NowUse_rtos_delay==0){
+if(NowUse_rtos==0){
 
 Delay_Ms_NoTask(ms);
 }else{
@@ -36,6 +39,9 @@ vTaskDelay(ms/portTICK_PERIOD_MS);
 }
 
 }
+
+
+
 
 void delay_us(uint32_t us){
 
