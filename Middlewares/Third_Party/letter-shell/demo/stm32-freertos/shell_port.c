@@ -31,6 +31,7 @@ char shellBuffer[512];
 
 static SemaphoreHandle_t shellMutex;
 SemaphoreHandle_t shellBinarySem =NULL;
+//osSemaphoreId shellBinarySem;
 //osSemaphoreId thread_uart_rx_sem;
 osThreadId thread_shellTaskHandle;
 /* 创建接收队列 */
@@ -121,49 +122,49 @@ void USART_SHELL_IRQHandler(void)
 //	}
 	
 	
-		    uint32_t ulReturn;
+//		    uint32_t ulReturn;
 
     // 仅处理Shell串口的中断
-    if (huart_shell_Handle.Instance == USART_SHELL)
-    {
+//    if (huart_shell_Handle.Instance == USART_SHELL)
+//    {
 //			if(NowUse_rtos==1){
 //        // 1. 进入中断级临界区（FreeRTOS专用）
 //        ulReturn = taskENTER_CRITICAL_FROM_ISR();
 //			}
-			uint32_t isrflags = READ_REG(huart_shell_Handle.Instance->ISR);
+//			uint32_t isrflags = READ_REG(huart_shell_Handle.Instance->ISR);
 //			if ((isrflags & USART_ISR_ORE) != RESET) {
 //        // H7 清除 ORE 标志的宏
 //        __HAL_UART_CLEAR_IT(&huart_shell_Handle, UART_CLEAR_OREF);
 //        // 清除后，RXNE 才能重新正常工作
 //    }
 			
-			if (isrflags & (USART_ISR_ORE | USART_ISR_NE | USART_ISR_FE | USART_ISR_PE)) {
-				uart_debug_dump(&huart_shell_Handle);
-        WRITE_REG(huart_shell_Handle.Instance->ICR, 0x1F); // 暴力清除所有错误标志
-    }
+//			if (isrflags & (USART_ISR_ORE | USART_ISR_NE | USART_ISR_FE | USART_ISR_PE)) {
+//				uart_debug_dump(&huart_shell_Handle);
+//        WRITE_REG(huart_shell_Handle.Instance->ICR, 0x1F); // 暴力清除所有错误标志
+//    }
 			
-			if ((isrflags & USART_ISR_RXNE_RXFNE) != RESET) {
-        // 直接读 RDR/DR 寄存器，这会自动清除 RXNE 标志位
-        uint8_t my_uartshell_redata = (uint8_t)(huart_shell_Handle.Instance->RDR);
-        
-        // 存入环形缓冲区并通知任务
-        RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring, my_uartshell_redata);
-        if(NowUse_rtos==1){
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        xSemaphoreGiveFromISR(shellBinarySem, &xHigherPriorityTaskWoken);
-				
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-				}
-        return; // 处理完即返回，不走 HAL 的流程
-    }
-			if ((isrflags & USART_ISR_ORE) != RESET) {
-        // H7 专用：写 ICR 寄存器的 ORECF 位来清除标志
-//        __HAL_UART_CLEAR_IT(&huart_shell_Handle, UART_CLEAR_OREF);
-        								uart_debug_dump(&huart_shell_Handle);
-								uart_debug_checkerror(&huart_shell_Handle,ENABLE);
-        /* 额外保险：如果是 HAL 状态机模式，这里返回能防止 HAL 进入 Error 回调关闭中断 */
-        return; 
-    }
+//			if ((isrflags & USART_ISR_RXNE_RXFNE) != RESET) {
+//        // 直接读 RDR/DR 寄存器，这会自动清除 RXNE 标志位
+//        uint8_t my_uartshell_redata = (uint8_t)(huart_shell_Handle.Instance->RDR);
+//        
+//        // 存入环形缓冲区并通知任务
+//        RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring, my_uartshell_redata);
+//        if(NowUse_rtos==1){
+//        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+//        xSemaphoreGiveFromISR(shellBinarySem, &xHigherPriorityTaskWoken);
+//				
+//        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+//				}
+//        return; // 处理完即返回，不走 HAL 的流程
+//    }
+//			if ((isrflags & USART_ISR_ORE) != RESET) {
+//        // H7 专用：写 ICR 寄存器的 ORECF 位来清除标志
+////        __HAL_UART_CLEAR_IT(&huart_shell_Handle, UART_CLEAR_OREF);
+//        								uart_debug_dump(&huart_shell_Handle);
+//								uart_debug_checkerror(&huart_shell_Handle,ENABLE);
+//        /* 额外保险：如果是 HAL 状态机模式，这里返回能防止 HAL 进入 Error 回调关闭中断 */
+//        return; 
+//    }
 		
 		#if 0
 			
@@ -201,7 +202,7 @@ void USART_SHELL_IRQHandler(void)
 	
 	#endif
 	
-}
+//}
 	
 	
 	
@@ -227,12 +228,53 @@ void HAL_UART_Shell_RxCpltCallback(UART_HandleTypeDef *huart){
 	
 	
 	
+//		if(huart->Instance==USART1)
+//	{
+//        osSemaphoreRelease(uart_rx_sem);
+//        // xSemaphoreGiveFromISR(uart_rx_sem, &taskWoken);
+//		HAL_UART_Receive_IT(&huart1, &shell.recv_data, 1);
+//	}
 	
 	
 	
 	
+			#if 1
+			    if(huart->Instance == USART_SHELL)//判断串口号
+    {
+        // 2. 将接收到的字节写入环形缓冲区
+       RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring,my_uartshell_redata);
+
+        // 3. 释放信号量，通知任务有数据可读
+        
+			if(NowUse_rtos==1){
+        xSemaphoreGiveFromISR(shellBinarySem, &xHigherPriorityTaskWoken);
+//				osSemaphoreRelease(shellBinarySem);
+			}
+        // 4. 重新开启串口接收中断（关键：持续接收下一个字节）
+//        HAL_UART_Receive_IT_UNLOCK(&huart_shell_Handle, (uint8_t *)&my_uartshell_redata, 1);
+					   while((RIT_Status=HAL_UART_Receive_IT(&huart_shell_Handle, (uint8_t *)&my_uartshell_redata, 1))!= HAL_OK){
+       // 中止当前接收
+//							SYSTEM_INFO(" RIT BUSY = %d State =%x %x err=%x\r\n",RIT_Status,huart_shell_Handle.RxState,HAL_UART_GetState(&huart_shell_Handle),huart->ErrorCode);
+								uart_debug_dump(&huart_shell_Handle);
+								uart_debug_checkerror(&huart_shell_Handle,ENABLE);
+
+//							 HAL_StatusTypeDef status = HAL_UART_AbortReceive(&huart_shell_Handle);
+//							SET_BIT(huart_shell_Handle.Instance->CR1, USART_CR1_RXNEIE);
+//        if (status != HAL_OK) {
+//            SYSTEM_INFO("Failed to abort receive: %d\r\n", status);
+//        }
+//							huart_shell_Handle.RxState = HAL_UART_STATE_READY;
+//      __HAL_UNLOCK(&huart_shell_Handle);
+    }
+			if(NowUse_rtos==1){
+        // 5. 退出临界区，并触发任务调度（如果需要）
+//        taskEXIT_CRITICAL_FROM_ISR(ulReturn);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+			}
+//			return;
+    }
 	
-	
+	#endif
 	
 	
 	
@@ -246,7 +288,7 @@ void HAL_UART_Shell_RxCpltCallback(UART_HandleTypeDef *huart){
 					SYSTEM_INFO("%c",my_uartshell_redata);
 				RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring,my_uartshell_redata);
         // 重启接收
-			taskENTER_CRITICAL(); // 进入临界区（关闭所有可屏蔽中断）
+//			taskENTER_CRITICAL(); // 进入临界区（关闭所有可屏蔽中断）
 //				    while((RIT_Status=HAL_UART_Receive_IT_UNLOCK(&huart_shell_Handle, (uint8_t *)&my_uartshell_redata, 1))!= HAL_OK){
 							   while((RIT_Status=HAL_UART_Receive_IT(&huart_shell_Handle, (uint8_t *)&my_uartshell_redata, 1))!= HAL_OK){
        // 中止当前接收
@@ -262,7 +304,7 @@ void HAL_UART_Shell_RxCpltCallback(UART_HandleTypeDef *huart){
 //							huart_shell_Handle.RxState = HAL_UART_STATE_READY;
 //      __HAL_UNLOCK(&huart_shell_Handle);
     }
-taskEXIT_CRITICAL(); // 退出临界区
+//taskEXIT_CRITICAL(); // 退出临界区
 
     }
 		#endif
@@ -398,6 +440,7 @@ int userShellUnlock(Shell *shell)
 
 int userShellMutexUnlock(void){
 if (xSemaphoreTake(shellBinarySem, portMAX_DELAY) == pdTRUE){
+//if (osSemaphoreWait(shellBinarySem, portMAX_DELAY) == pdTRUE){
 return 1;
 }
 return 0;
@@ -413,11 +456,15 @@ void LetterShell_OS_Init(void)
 //	lpuart_disable_fifo_hal(&huart_shell_Handle); // 关闭FIFO
 		// 在 UART 初始化后，添加：
 __HAL_UART_ENABLE_IT(&huart_shell_Handle, UART_IT_ERR);
-	
+	HAL_UART_Receive_IT(&huart_shell_Handle,(uint8_t *)&my_uartshell_redata,1);
 //	HAL_UART_Receive_IT_UNLOCK(&huart_shell_Handle,(uint8_t *)&my_uartshell_redata,1);
-__HAL_UART_ENABLE_IT(&huart_shell_Handle, UART_IT_RXNE);
+//__HAL_UART_ENABLE_IT(&huart_shell_Handle, UART_IT_RXNE);
     shellMutex = xSemaphoreCreateMutex();
+	
 			shellBinarySem = xSemaphoreCreateBinary();	 
+//	   osSemaphoreDef(shellBinarySem);
+//    shellBinarySem = osSemaphoreCreate(osSemaphore(shellBinarySem),1);
+	
     shell.write = userShellWrite;
 //    shell.read = userShellRead;
 	#if SHELL_USING_LOCK == 1

@@ -24,7 +24,7 @@
 
 
 UART_HandleTypeDef huart_shell_Handle;
-
+DMA_HandleTypeDef hdma_shell_rx;
 
 #if TEST_SHELL_UART
 
@@ -65,6 +65,22 @@ void USART_Shell_UartInit(void)
         Error_Handler();
     }
 
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart_shell_Handle, UART_TXFIFO_THRESHOLD_1_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart_shell_Handle, UART_RXFIFO_THRESHOLD_1_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+//  if (HAL_UARTEx_DisableFifoMode(&huart_shell_Handle) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+	  if (HAL_UARTEx_EnableFifoMode(&huart_shell_Handle) != HAL_OK)//开启后数据迟缓加载，好比有个管道，填满后才能出来
+  {
+    Error_Handler();
+  }
     /* 使能 RXNE + IDLE 中断 */
 //// 2. 强行关闭 RX 和 TX 的硬件 FIFO
 //HAL_UARTEx_DisableFifoMode(&huart_shell_Handle);
@@ -91,6 +107,37 @@ void USART_Shell_UartInit(void)
 		
 		 
 }
+
+void USART_RX_ShellDMA_Config(UART_HandleTypeDef* uartHandle){
+
+  if(uartHandle->Instance==USART_SHELL)
+  {
+    /* USART1_RX Init */
+    hdma_shell_rx.Instance = DMA1_Stream1;
+    hdma_shell_rx.Init.Request = DMA_REQUEST_USART1_RX;
+    hdma_shell_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_shell_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_shell_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_shell_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_shell_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_shell_rx.Init.Mode = DMA_NORMAL;
+    hdma_shell_rx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_shell_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+		
+    if (HAL_DMA_Init(&hdma_shell_rx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(uartHandle,hdmarx,hdma_shell_rx);
+  /* DMA2_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 8, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+	}
+
+}
+
+
 
 
 void USART_Shell_UartDeInit(void)

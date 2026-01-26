@@ -36,8 +36,7 @@
 //#include "business.h"
 
 
-#include "./lvgl_port.h"
-#include "lvgl.h"
+
 //#include "lv_port_disp_template.h"
 //#include "lv_port_indev_template.h"
 //#include "lv_demo_stress.h"
@@ -50,6 +49,16 @@
 //#include "./usart/bsp_usart.h"
 #include "./SEGGER_TOOLKIT.h"
 #include "./sys/bsp_systime.h"   
+
+
+
+
+
+#include "./task/user_SystemTask.h"
+#include "./task/user_LVGLTask.h"
+
+
+
 
 /******************************* 宏定义 ************************************/
 /*
@@ -90,8 +99,15 @@ TaskHandle_t tmp_handle;
 /*
  * 当我们在写应用程序的时候，可能需要用到一些全局变量。
  */
+#define TASK_PARAMETER_(name)	volatile void *TASK_PARAMETER_##name	
+#define vTASK_PARAMETER_(name)	TASK_PARAMETER_###name	
+
+#define TASK_NAME_STR(name)  #name
 
 
+TASK_PARAMETER_(T_1_Task);
+TASK_PARAMETER_(T_2_Task);
+//void *TASK_PARAMETER_T_1_Task;
 /*
 *************************************************************************
 *                             函数声明
@@ -101,11 +117,11 @@ static void AppTaskCreate(void);/* 用于创建任务 */
 
 static void T_1_Task(void* pvParameters);/* LED_Task任务实现 */
 static void T_2_Task(void* pvParameters);/* KEY_Task任务实现 */
-void SEGGERTask(void *pvParameters);
+//void SEGGERTask(void *pvParameters);
 //QueueHandle_t Test_Queue =NULL;
 
 
-void vLvglTask(void *pvParameters);  /* 任务函数 */
+//void vLvglTask(void *pvParameters);  /* 任务函数 */
 /*****************************************************************
   * @brief  主函数
   * @param  无
@@ -178,7 +194,7 @@ vPrintStack_TaskCreationResult("shell", xReturn, 256);
   xReturn = xTaskCreate((TaskFunction_t )T_1_Task, /* 任务入口函数 */
                         (const char*    )"T_1_Task",/* 任务名字 */
                         (uint16_t       )128,   /* 任务栈大小 */
-                        (void*          )NULL,	/* 任务入口函数参数 */
+                        (void*          )TASK_PARAMETER_T_1_Task,	/* 任务入口函数参数 */
                         (UBaseType_t    )13,	    /* 任务的优先级 */
                         (TaskHandle_t*  )&tmp_handle);/* 任务控制块指针 */
    vPrintStack_TaskCreationResult("T_1_Task", xReturn, 128);
@@ -187,7 +203,7 @@ vPrintStack_TaskCreationResult("shell", xReturn, 256);
   xReturn = xTaskCreate((TaskFunction_t )T_2_Task,  /* 任务入口函数 */
                         (const char*    )"T_2_Task",/* 任务名字 */
                         (uint16_t       )128,  /* 任务栈大小 */
-                        (void*          )NULL,/* 任务入口函数参数 */
+                        (void*          )TASK_PARAMETER_T_2_Task,/* 任务入口函数参数 */
                         (UBaseType_t    )12, /* 任务的优先级 */
                         (TaskHandle_t*  )&tmp_handle);/* 任务控制块指针 */ 
  vPrintStack_TaskCreationResult("T_2_Task", xReturn, 128);
@@ -252,34 +268,9 @@ void StartNeedDeleteTask(void *pvParameters)
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
-/**
- * @brief       LVGL运行例程
- * @param       pvParameters : 传入参数(未用到)
- * @retval      无
- */
-void vLvglTask(void *pvParameters)
-{
-
-		lv_init_all();
-		lv_test();
-    
-    while(1)
-    {
-        lv_timer_handler(); /* LVGL计时器 */
-        vTaskDelay(pdMS_TO_TICKS(50));
-    }
-}
-
-void SEGGERTask(void *pvParameters)
-{
 
 
-    while(1)
-    {
-        SEGGER_HostDataToUsart(); /* LVGL计时器 */
-        vTaskDelay(pdMS_TO_TICKS(500));
-    }
-}
+
 
 #include "log.h"
 
@@ -287,12 +278,18 @@ void SEGGERTask(void *pvParameters)
 #include "./TaskTest/Task_check.h"
 
 #include "stdarg.h"
-
+volatile uint16_t timedelar_T_1_Task;
 static void T_1_Task(void* parameter)
 {	
 //	BaseType_t xReturn = pdTRUE;/* 定义一个创建信息返回值，默认为pdTRUE */
 //	 uint32_t r_queue;	/* 定义一个接收消息的变量 */
 	int count = 0;
+	timedelar_T_1_Task=3000;
+	if(parameter!=NULL){
+	SYSTEM_I_PRINT("1 parameter: %d", (uint16_t*)parameter);
+	}else{
+	SYSTEM_I_PRINT("1 err parameter: %d", (uint16_t*)parameter);
+	}
   while (1)
   {
 //LED1_TOGGLE;
@@ -307,28 +304,71 @@ static void T_1_Task(void* parameter)
 		
 //		printf("xxxxxx\r\n");
 		 SYSTEM_DEBUG(" T_1_Task !\r\n");
-    vTaskDelay(8000/portTICK_PERIOD_MS);   /* 延时1000个ms */
+    vTaskDelay(timedelar_T_1_Task/portTICK_PERIOD_MS);   /* 延时1000个ms */
   }
 }
 
 #include <elog.h>
 
 extern Shell shell;
+volatile uint16_t timedelar_T_2_Task;
 static void T_2_Task(void* parameter)
 {	
 //	BaseType_t xReturn = pdTRUE;/* 定义一个创建信息返回值，默认为pdTRUE */
 //	 uint32_t r_queue;	/* 定义一个接收消息的变量 */
+	timedelar_T_2_Task=3000;
+		if(parameter!=NULL){
+	SYSTEM_I_PRINT("2 parameter: %d", (uint16_t*)parameter);
+	}else{
 	
+	SYSTEM_I_PRINT("2 err parameter: %d", (uint16_t*)parameter);
+	}
   while (1)
   {
-//LED2_TOGGLE;
-//		printf(" T_2_Task !\r\n");
 
-//		shellPrint(&shell, "T_2_Task");
-//	log_a(" T_2_Task !\r\n");
-    vTaskDelay(pdMS_TO_TICKS(10000));   /* 延时1000个ms */
+    vTaskDelay(pdMS_TO_TICKS(timedelar_T_2_Task));   /* 延时1000个ms */
   }
 }
+#include "freertos.h"
+#include "task.h"
+#include "string.h"
+
+
+
+
+int changetime(char *pcTaskName,int i)
+{
+	    if (pcTaskName == NULL || *pcTaskName == '\0') {
+        return NULL;
+    }
+ 
+ TaskHandle_t tmp_handle;
+ TaskStatus_t xTaskDetails;
+	tmp_handle = xTaskGetHandle(pcTaskName);
+	if(NULL==tmp_handle){
+	SYSTEM_I_PRINT("task name is wrong!\r\n");
+		return 0;
+	}
+
+ vTaskGetInfo(tmp_handle,&xTaskDetails,1,eInvalid);
+	
+		
+    SYSTEM_I_PRINT("string: %s ,%d  %s \r\n",pcTaskName, i,xTaskDetails.pcTaskName);
+	if (strcmp("T_2_Task", pcTaskName)==0){
+	
+	timedelar_T_2_Task=i;
+	}else if(strcmp("T_1_Task", pcTaskName)==0){
+
+		
+timedelar_T_1_Task=i;
+}else{
+SYSTEM_I_PRINT("no name \r\n");
+}
+
+}
+SHELL_EXPORT_CMD(SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC), ct, changetime, test);
+
+
 
 /**
  * @brief      FreeRTOS Tick 钩子函数
