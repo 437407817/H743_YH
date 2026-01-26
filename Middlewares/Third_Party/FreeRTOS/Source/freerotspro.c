@@ -294,7 +294,7 @@ static void T_1_Task(void* parameter)
   {
 //LED1_TOGGLE;
 		Handle_test3();
-				logInfo("T_2_Task:-----\n");
+				logInfo("T_1_Task:-----\n");
 		SYSTEM_I_PRINT("Task is running, count: %d", count++);
 		taskYIELD();
 		SYSTEM_D_PRINT("Task is running, count: %d", count++);

@@ -73,14 +73,14 @@ void USART_Shell_UartInit(void)
   {
     Error_Handler();
   }
-//  if (HAL_UARTEx_DisableFifoMode(&huart_shell_Handle) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-	  if (HAL_UARTEx_EnableFifoMode(&huart_shell_Handle) != HAL_OK)//开启后数据迟缓加载，好比有个管道，填满后才能出来
+  if (HAL_UARTEx_DisableFifoMode(&huart_shell_Handle) != HAL_OK)
   {
     Error_Handler();
   }
+//	  if (HAL_UARTEx_EnableFifoMode(&huart_shell_Handle) != HAL_OK)//开启后数据迟缓加载，好比有个管道，填满后才能出来
+//  {
+//    Error_Handler();
+//  }
     /* 使能 RXNE + IDLE 中断 */
 //// 2. 强行关闭 RX 和 TX 的硬件 FIFO
 //HAL_UARTEx_DisableFifoMode(&huart_shell_Handle);

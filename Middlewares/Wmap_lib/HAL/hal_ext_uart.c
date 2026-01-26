@@ -81,8 +81,19 @@ if ((huart->Instance->CR1 & USART_CR1_RXNEIE) == 0) {
     SYSTEM_INFO("RXNE Interrupt Disabled! \r\n");
 	if(ablestate==ENABLE){
 //		HAL_NVIC_DisableIRQ(USART1_IRQn);
-//	__HAL_UART_ENABLE_IT(huart, UART_IT_RXNE); // 使能RXNE中断
-		huart->Instance->CR1 |= USART_CR1_RXNEIE;
+	__HAL_UART_ENABLE_IT(huart, UART_IT_RXNE); // 使能RXNE中断
+				   if (__HAL_UART_GET_FLAG(huart, UART_FLAG_ORE) == RESET) {
+        SYSTEM_INFO("? UART ORE Flag Cleared!\r\n");
+    } else {
+        SYSTEM_INFO("? Failed to Clear UART ORE Flag!\r\n");
+    }
+		 __HAL_UART_CLEAR_OREFLAG(huart);
+		   if (__HAL_UART_GET_FLAG(huart, UART_FLAG_ORE) == RESET) {
+        SYSTEM_INFO("? UART ORE Flag Cleared!\r\n");
+    } else {
+        SYSTEM_INFO("? Failed to Clear UART ORE Flag!\r\n");
+    }
+//		huart->Instance->CR1 |= USART_CR1_RXNEIE;
 
 	}
   
