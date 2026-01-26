@@ -104,12 +104,14 @@ void uart_debug_error(void){
 
 uart_debug_dump(&huart_shell_Handle);
 uart_debug_checkerror(&huart_shell_Handle,DISABLE);	
+	
 }
 
 void uart_debug_fixerror(void){
 
 
-uart_debug_checkerror(&huart_shell_Handle,ENABLE);	
+uart_debug_checkerror(&huart_shell_Handle,ENABLE);
+	
 }
 
 

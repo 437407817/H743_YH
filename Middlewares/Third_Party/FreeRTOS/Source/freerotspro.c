@@ -298,7 +298,7 @@ static void T_1_Task(void* parameter)
 		SYSTEM_I_PRINT("Task is running, count: %d", count++);
 		taskYIELD();
 		SYSTEM_D_PRINT("Task is running, count: %d", count++);
-		
+		SYSTEM_D_PRINT("T+++");
 //		Check_Usart1_enable();
 //		Check_Usart1_clock_enable();
 		

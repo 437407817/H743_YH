@@ -50,17 +50,9 @@ void uart_debug_dump(UART_HandleTypeDef *huart)
     // 3. 中断使能状态
     SYSTEM_INFO("3. Interrupt Enable Status:\r\n");
     uint32_t cr1 = huart->Instance->CR1;
-//    SYSTEM_INFO("   - RXNE Interrupt: %d, Error Interrupt(ERR): %d\r\n",
-//								(cr1 & UART_IT_RXNE) ? 1:0,			//1:允许数据就绪时触发中断
-//                (cr1 & UART_IT_ERR) ? 1:0);
-    uint32_t rxne_it_en = (cr1 & UART_IT_RXNE) ? 1 : 0;
-    uint32_t err_it_en = (cr1 & UART_IT_ERR) ? 1 : 0;
-    SYSTEM_INFO("   - RXNE Interrupt: %d | Meaning: %s\r\n",
-                rxne_it_en,
-                rxne_it_en ? "Allow RXNE status to trigger UART interrupt" : "Disable RXNE status from triggering UART interrupt");
-    SYSTEM_INFO("   - Error Interrupt(ERR): %d | Meaning: %s\r\n",
-                err_it_en,
-                err_it_en ? "Allow errors (ORE/PE/FE/NE) to trigger UART interrupt" : "Disable errors from triggering UART interrupt");
+    SYSTEM_INFO("   - RXNE Interrupt: %d, Error Interrupt(ERR): %d\r\n",
+                (cr1 & UART_IT_RXNE) ? 1:0,
+                (cr1 & UART_IT_ERR) ? 1:0);
     
     // 4. 初始化状态（替代 IsInitialized）
     SYSTEM_INFO("4. Initialization Status:\r\n");
@@ -80,21 +72,7 @@ void uart_debug_checkerror(UART_HandleTypeDef *huart,FunctionalState ablestate){
 if ((huart->Instance->CR1 & USART_CR1_RXNEIE) == 0) {
     SYSTEM_INFO("RXNE Interrupt Disabled! \r\n");
 	if(ablestate==ENABLE){
-//		HAL_NVIC_DisableIRQ(USART1_IRQn);
 	__HAL_UART_ENABLE_IT(huart, UART_IT_RXNE); // 使能RXNE中断
-				   if (__HAL_UART_GET_FLAG(huart, UART_FLAG_ORE) == RESET) {
-        SYSTEM_INFO("? UART ORE Flag Cleared!\r\n");
-    } else {
-        SYSTEM_INFO("? Failed to Clear UART ORE Flag!\r\n");
-    }
-		 __HAL_UART_CLEAR_OREFLAG(huart);
-		   if (__HAL_UART_GET_FLAG(huart, UART_FLAG_ORE) == RESET) {
-        SYSTEM_INFO("? UART ORE Flag Cleared!\r\n");
-    } else {
-        SYSTEM_INFO("? Failed to Clear UART ORE Flag!\r\n");
-    }
-//		huart->Instance->CR1 |= USART_CR1_RXNEIE;
-
 	}
   
 }
