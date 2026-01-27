@@ -43,7 +43,7 @@ void uart_debug_dump(UART_HandleTypeDef *huart)
                 (isr & UART_FLAG_PE) ? 1:0,
                 (isr & UART_FLAG_FE) ? 1:0,
                 (isr & UART_FLAG_NE) ? 1:0);
-    SYSTEM_INFO("   - RXNE(Receive Ready): %d, TXE(Transmit Ready): %d\r\n",
+    SYSTEM_INFO("   - RXNE(Receive have data): %d, TXE(Transmit Ready): %d\r\n",
                 (isr & UART_FLAG_RXNE) ? 1:0,
                 (isr & UART_FLAG_TXE) ? 1:0);
     
