@@ -78,12 +78,12 @@ Test_all_queue();
 	
 }
 
-
+#include "./rtosprintf/frtos_printf.h"
 void Handle_led(void){
 
 
 //LED00_Toggle;
-	printf("*");
+	SYSTEM_I_PRINT("*******************************\r\n");
 }
 
 

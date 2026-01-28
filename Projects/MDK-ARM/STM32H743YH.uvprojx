@@ -1329,11 +1329,6 @@
           <GroupName>Third_Party/FreeRTOS</GroupName>
           <Files>
             <File>
-              <FileName>freerotspro.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\Middlewares\Third_Party\FreeRTOS\Source\freerotspro.c</FilePath>
-            </File>
-            <File>
               <FileName>cmsis_os.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_\cmsis_os.c</FilePath>
@@ -1388,6 +1383,11 @@
         <Group>
           <GroupName>Third_Party/FreeRTOS/TASK</GroupName>
           <Files>
+            <File>
+              <FileName>freerotspro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Middlewares\Third_Party\FreeRTOS\Source\freerotspro.c</FilePath>
+            </File>
             <File>
               <FileName>user_LVGLTask.c</FileName>
               <FileType>1</FileType>

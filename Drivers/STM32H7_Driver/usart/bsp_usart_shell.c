@@ -276,9 +276,11 @@ void Test_USART_SHELL_while(void){
 int fputc(int ch, FILE *f)
 {
 	/* 发送一个字节数据到串口USART_A */
-	HAL_UART_Transmit(&huart_shell_Handle, (uint8_t *)&ch, 1, 1000);	
-	
-	return (ch);
+//	HAL_UART_Transmit(&huart_shell_Handle, (uint8_t *)&ch, 1, 1000);	禁止使用，容易ORE错误
+	 while ((USART_SHELL->ISR & 0X40) == 0){};    /* 等待上一个字符发送完成 */
+    USART_SHELL->TDR = (uint8_t)ch;            /* 将要发送的字符 ch 写入到DR寄存器 */
+    return ch;
+
 }
 
 ///重定向c库函数scanf到串口USART_A，重写向后可使用scanf、getchar等函数

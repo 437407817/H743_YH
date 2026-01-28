@@ -79,48 +79,9 @@ void USART_SHELL_IRQHandler(void)
 
 	
 	
-//	    if(huart_shell_Handle.Instance == USART_SHELL)//判断串口号
-//    {
-//	    uint32_t isr_flags = huart_shell_Handle.Instance->ISR; // 读取中断状态寄存器
-//    uint32_t cr1_flags = huart_shell_Handle.Instance->CR1; // 读取控制寄存器1
-//    // 1. 优先处理 ORE 错误（H743 需先清错误，再读数据）
 
-//    // 1. 处理接收非空中断（正常接收逻辑）
-//    if ((isr_flags & USART_ISR_RXNE_RXFNE) && (cr1_flags & USART_CR1_RXNEIE))
-//    {
-//        // 读取接收数据（必须读DR寄存器清除RXNE标志）
-//         my_uartshell_redata = huart_shell_Handle.Instance->RDR;
-//        // 发送到消息队列（复杂处理放任务中，回调只做最小操作）
-////        xQueueSendFromISR(uart_rx_queue, &recv_data, NULL);
-
-//			 RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring,my_uartshell_redata);
-////				shellHandler(&shell, my_uartshell_redata);
-
-//			
-//        // 确保 RXNEIE 位始终开启（关键：防止被静默错误关闭）
-//        huart_shell_Handle.Instance->CR1 |= USART_CR1_RXNEIE;
-//			
-////        return;
-//    }
-
-    // 2. 主动处理串口静默错误（FE/ NE/ ORE）
-//    if (isr_flags & (USART_ISR_FE | USART_ISR_NE | USART_ISR_ORE))
-//    {
-//			uart_debug_dump(&huart_shell_Handle);
-//        // 第一步：清除所有错误标志（必须操作，否则错误会一直存在）
-//        huart_shell_Handle.Instance->ICR = USART_ICR_FECF | USART_ICR_NECF | USART_ICR_ORECF;
-//        
-//        // 第二步：强制恢复 RXNEIE 位（核心：避免错误导致中断关闭）
-//        huart_shell_Handle.Instance->CR1 |= USART_CR1_RXNEIE;
-//        
-//        // 可选：记录错误日志，方便排查硬件问题（比如串口电平不稳）
-//			SYSTEM_INFO("err :ISR=0x%08X , recocered\r\n", isr_flags);
-
-//    }
-		
-//	}
 	
-	#if 1
+	#if 0  //可用，成功测试1
 		    uint32_t ulReturn;
 
     // 仅处理Shell串口的中断
@@ -148,12 +109,14 @@ void USART_SHELL_IRQHandler(void)
         
         // 存入环形缓冲区并通知任务
         RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring, my_uartshell_redata);
+				#if USE_OS
         if(NowUse_rtos==1){
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         xSemaphoreGiveFromISR(shellBinarySem, &xHigherPriorityTaskWoken);
 				
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 				}
+				#endif
 //        return; // 处理完即返回，不走 HAL 的流程
     }
 			if ((isrflags & USART_ISR_ORE) != RESET) {
@@ -164,52 +127,12 @@ void USART_SHELL_IRQHandler(void)
         /* 额外保险：如果是 HAL 状态机模式，这里返回能防止 HAL 进入 Error 回调关闭中断 */
         return; 
     }
-		
-		#if 0
-			
-        // 2. 将接收到的字节写入环形缓冲区
-       RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring,my_uartshell_redata);
-
-        // 3. 释放信号量，通知任务有数据可读
-        
-			if(NowUse_rtos==1){
-        xSemaphoreGiveFromISR(shellBinarySem, &xHigherPriorityTaskWoken);
-			}
-        // 4. 重新开启串口接收中断（关键：持续接收下一个字节）
-//        HAL_UART_Receive_IT_UNLOCK(&huart_shell_Handle, (uint8_t *)&my_uartshell_redata, 1);
-					   while((RIT_Status=HAL_UART_Receive_IT(&huart_shell_Handle, (uint8_t *)&my_uartshell_redata, 1))!= HAL_OK){
-       // 中止当前接收
-//							SYSTEM_INFO(" RIT BUSY = %d State =%x %x err=%x\r\n",RIT_Status,huart_shell_Handle.RxState,HAL_UART_GetState(&huart_shell_Handle),huart->ErrorCode);
-								uart_debug_dump(&huart_shell_Handle);
-								uart_debug_checkerror(&huart_shell_Handle,ENABLE);
-
-//							 HAL_StatusTypeDef status = HAL_UART_AbortReceive(&huart_shell_Handle);
-//							SET_BIT(huart_shell_Handle.Instance->CR1, USART_CR1_RXNEIE);
-//        if (status != HAL_OK) {
-//            SYSTEM_INFO("Failed to abort receive: %d\r\n", status);
-//        }
-//							huart_shell_Handle.RxState = HAL_UART_STATE_READY;
-//      __HAL_UNLOCK(&huart_shell_Handle);
-    }
-			if(NowUse_rtos==1){
-        // 5. 退出临界区，并触发任务调度（如果需要）
-//        taskEXIT_CRITICAL_FROM_ISR(ulReturn);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-			}
-			return;
-    }
-	
-	#endif
-	
 }
 	
 	#endif
 	
 HAL_UART_IRQHandler(&huart_shell_Handle);
 	
-//if(NowUse_rtos==1){
-//taskEXIT_CRITICAL_FROM_ISR( ulReturn );	
-//}
 
 }
 //CEVENT_EXPORT(EVENT_INIT_STAGE2, LetterShell_OS_Init);
@@ -221,25 +144,9 @@ void HAL_UART_Shell_RxCpltCallback(UART_HandleTypeDef *huart){
 	
 //	SYSTEM_INFO("+");
 //	HAL_Delay(200);
-	
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-			#if 0
-			if(huart->Instance == USART_SHELL)//判断串口号,弄不活，只能放在callback中，放在主中卡死
+			#if 1
+			if(huart->Instance == USART_SHELL)   //可用，成功测试2    //只能放在callback中，放在主中卡死 
     {
         // 2. 将接收到的字节写入环形缓冲区
        RingBuffer_WriteByte(&shellRingBuffer.shell_rx_ring,my_uartshell_redata);
@@ -351,33 +258,32 @@ void HAL_UART_Shell_ErrorCallback(UART_HandleTypeDef *huart)
 short userShellWrite(char *data, unsigned short len)
 {
 //    serialTransmit(&debugSerial, (uint8_t *)data, len, 0x1FF);
-	HAL_UART_Transmit(&huart_shell_Handle, (uint8_t *)data, len, 0xFFFF);
-//	HAL_UART_Transmit(&huart_shell_Handle, (uint8_t *)data, len, 0x1FF);
+//	HAL_UART_Transmit(&huart_shell_Handle, (uint8_t *)data, len, 0xFFFF);
+    // 判空：避免传入空指针导致程序崩溃（健壮性优化）
+    if (data == NULL || len == 0)
+    {
+        return 0;
+    }
+
+    // 遍历每一个字符，逐字符通过寄存器发送
+    for (unsigned short i = 0; i < len; i++)
+    {
+        // 等待上一个字符发送完成（TC位：Transmission Complete，ISR寄存器第6位）
+        while ((USART_SHELL->ISR & 0X40) == 0);
+        
+        // 将要发送的字符写入数据发送寄存器（TDR），触发硬件发送
+        USART_SHELL->TDR = (uint8_t)data[i];
+    }
+
+    // 等待最后一个字符发送完成（避免函数返回后数据未发完）
+    while ((USART_SHELL->ISR & 0X40) == 0);
+
+    // 返回发送的长度（保持和原函数一致的返回值）
     return len;
 }
 
 
-/**
- * @brief 用户shell读
- * 
- * @param data 数据
- * @param len 数据长度
- * 
- * @return short 实际读取到
- */
-//short userShellRead(char *data, unsigned short len)
-//{
-//	HAL_StatusTypeDef status;
-////    return serialReceive(&debugSerial, (uint8_t *)data, len, 0);
-////	while (__HAL_UART_GET_FLAG(&huart_shell_Handle, UART_FLAG_RXNE) == RESET){};
-//	status = HAL_UART_Receive(&huart_shell_Handle, (uint8_t *)data, 1, 0xFFFF);
-//	    if (status == HAL_OK) {
-//        return 1;
-//    } else {
-//        return 0;
-//    }
-//	
-//}
+
 
 /**
  * @brief 用户shell上锁

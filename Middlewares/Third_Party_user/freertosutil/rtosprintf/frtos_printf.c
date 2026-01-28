@@ -21,7 +21,7 @@
 
 // 全局标志：0=FreeRTOS未启动，1=FreeRTOS已启动
 static uint8_t rtosShell_running = 0;
-static char log_buf[512] = {0};
+static char log_buf[256] = {0};
 /**
  * @brief 标记FreeRTOS已启动（需在vTaskStartScheduler后调用）
  */

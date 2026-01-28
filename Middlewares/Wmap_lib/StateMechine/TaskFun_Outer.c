@@ -48,7 +48,7 @@ TaskComps_t g_taskComps[] =
    {0, 1000,   3000, Disable,0 , Handle_usart},
 	 {0, 20000,   20000,  Enable,2,Handle_test },	
 	 {0, 2000,   8000,  Disable,10,Handle_test2},	
-	 	 {0, 1000,   1000,  Disable,10,Handle_led},	
+	 	 {0, 1000,   10,  Disable,10,Handle_led},	
 //		 {0, 2000,   2000,  Disable,10,Handle_DMA_USART_Save},	
 //		  {0, 2000,   200,  Disable,10,Handle_DMA_USART_Send},
 #if !(USE_LVGL_OS)&&(USE_LVGL)
@@ -63,7 +63,7 @@ TaskComps_t g_taskComps[] =
 		#endif
 		 
 		 #if USE_LETTER_SHELL&&(!USE_OS)
-		 {0, 200,   200,  Disable,10,Handle_letter_Shell_NoOsWhile},	
+		 {0, 10,   10,  Disable,10,Handle_letter_Shell_NoOsWhile},	
 		 #endif
 		 
 		 #if (!USE_OS)&&USE_TOUCH_IIC
