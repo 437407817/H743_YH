@@ -168,8 +168,9 @@ TouchDrvInit();//裸机时才用
 
 
 
-
+#if (!USE_OS)
 easylogger_init();SYSTEM_INFO("easylogger_init over------------- \n");
+#endif
 //USE_FREERTOS 
 
 

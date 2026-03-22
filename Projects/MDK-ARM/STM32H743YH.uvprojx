@@ -1782,6 +1782,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Application/Modules/Business</GroupName>
+          <Files>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Middlewares\Wmap_lib\Modules\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>mmc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Middlewares\Wmap_lib\Modules\mmc.h</FilePath>
+            </File>
+            <File>
+              <FileName>mmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Middlewares\Wmap_lib\Modules\mmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>business.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Middlewares\Wmap_lib\Modules\business.c</FilePath>
+            </File>
+            <File>
+              <FileName>busi_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Middlewares\Wmap_lib\Modules\busi_test.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>WMAP_lib/sys</GroupName>
           <Files>
             <File>

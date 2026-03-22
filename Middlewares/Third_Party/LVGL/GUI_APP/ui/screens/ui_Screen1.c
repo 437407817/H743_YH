@@ -34,6 +34,22 @@ static void btn_callback(lv_event_t *e)
     // 发送事件
     // lv_obj_send_event(slider, LV_EVENT_VALUE_CHANGED, NULL);
 }
+
+static void dropdown_cb(lv_event_t *e)
+{
+    // 获取索引下标
+    lv_obj_t *dropdown = lv_event_get_target(e);
+    uint32_t index = lv_dropdown_get_selected(dropdown);
+    printf("index:%d\n", index);
+}
+
+static void roller_cb(lv_event_t *e)
+{
+    // 获取索引下标 - Roller 使用 lv_roller_get_selected()
+    lv_obj_t *roller = lv_event_get_target(e);
+    uint32_t index = lv_roller_get_selected(roller);
+    printf("roller selected index:%d\n", index);
+}
 // build funtions
 
 void ui_Screen1_screen_init(void)
@@ -108,6 +124,53 @@ lv_obj_set_style_bg_color(ui_header2, lv_color_hex(0xf4f0f0), LV_PART_MAIN | LV_
 
     // 添加点击事件
      lv_obj_add_event_cb(btn1, btn_callback, LV_EVENT_CLICKED, "hello");
+
+     // 1. 直接创建drop_down
+    lv_obj_t *dropdown = lv_dropdown_create(ui_header2);
+
+    // 2. 添加下拉菜单的选项
+    lv_dropdown_set_options(dropdown, "Apple\n"
+                                      "Banana\n"
+                                      "Orange\n"
+                                      "Cherry\n"
+                                      "Grape\n"
+                                      "Raspberry\n"
+                                      "Melon\n"
+                                      "Orange\n"
+                                      "Lemon\n"
+                                      "Nuts");
+
+    // 设置下拉菜单不同的方向
+    lv_dropdown_set_dir(dropdown, LV_DIR_RIGHT);
+    // 修改三角符号 匹配下拉菜单的方向
+    lv_dropdown_set_symbol(dropdown, LV_SYMBOL_RIGHT);
+
+    // 添加不同选项的回调函数
+    lv_obj_add_event_cb(dropdown, dropdown_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+
+            lv_obj_t *roller1 = lv_roller_create(ui_header2);
+    lv_roller_set_options(roller1,
+                          "January\n"
+                          "February\n"
+                          "March\n"
+                          "April\n"
+                          "May\n"
+                          "June\n"
+                          "July\n"
+                          "August\n"
+                          "September\n"
+                          "October\n"
+                          "November\n"
+                          "December",
+                          LV_ROLLER_MODE_INFINITE);
+
+    lv_roller_set_visible_row_count(roller1, 4);
+    lv_obj_center(roller1);
+    // 设置默认选中值 (可选，避免未定义状态)
+    lv_roller_set_selected(roller1, 0, LV_ANIM_OFF);
+    // 使用正确的 Roller 回调函数
+    lv_obj_add_event_cb(roller1, roller_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
 
 }

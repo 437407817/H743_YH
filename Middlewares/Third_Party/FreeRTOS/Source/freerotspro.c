@@ -53,8 +53,8 @@
 
 #include "./task/user_SystemTask.h"
 #include "./task/user_LVGLTask.h"
-
-
+#include "./Modules/business.h"
+#include <elog.h>
 
 
 /******************************* ∫Í∂®“Â ************************************/
@@ -226,6 +226,12 @@ vPrintStack_TaskCreationResult("shell", xReturn, 256);
                 (TaskHandle_t*  )&tmp_handle);
 vPrintStack_TaskCreationResult("SEGGERTask", xReturn, 256);				 
 			 
+								
+								
+			xTaskCreate(busi_process_task_entry,"busi_pro_task",128,(void *)0,7,&tmp_handle);				
+			vPrintStack_TaskCreationResult("busi_pro_task", xReturn, 128);
+
+easylogger_init();								
 //    xTaskCreate((TaskFunction_t )uart_health_check_task,
 //                (const char*    )"uart_health_check_task",
 //                (uint16_t       )256, 

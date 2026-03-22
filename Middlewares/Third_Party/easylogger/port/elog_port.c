@@ -35,11 +35,15 @@
 #include "./SEGGER_RTT.h"
 #include "cmsis_os.h"
 //#include "cmsis_os2.h"
-
+#include "log.h" 
+#include "./usart/bsp_usart_shell.h"
 //! 日志互斥信号量句柄
 static SemaphoreHandle_t LogMutexSemaphore = NULL; //freertos
 //static osSemaphoreId elog_lockHandle;	//cmsis_os
 //static osSemaphoreId_t elog_lockHandle;	//cmsis_os
+#ifdef ELOG_ASYNC_OUTPUT_ENABLE
+static osSemaphoreId elog_asyncHandle= NULL;;
+#endif
 /**
  * EasyLogger port initialize
  *
@@ -52,6 +56,9 @@ ElogErrCode elog_port_init(void) {
         //! 创建互斥信号值
 #if USE_OS
     LogMutexSemaphore = xSemaphoreCreateMutex();//! 创建互斥信号值freertos
+	#ifdef ELOG_ASYNC_OUTPUT_ENABLE
+	elog_asyncHandle = xSemaphoreCreateMutex();
+	#endif
 //			osSemaphoreDef(elog_lockHandle);
     if (LogMutexSemaphore == NULL) {
         printf("elog sem create fail\r\n");
@@ -88,9 +95,17 @@ void elog_port_output(const char *log, size_t size) {
     //! 在精度控制时，小数点后的十进制数可以使用 * 来占位，
     //! 在后面提供一个变量作为精度控制的具体值
 	#if 1
-	printf("%.*s", size, log);//打印在串口端
+//	printf("%.*s", size, log);//打印在串口端
+	logDebug("%.*s", size, log);
+	
+//	    for (size_t i = 0; i < size; i++)
+//    {
+//        while((USART_SHELL->ISR & 0X40) == 0);
+
+//        USART_SHELL->TDR = (uint8_t)log[i];
+//    }
 	#endif
-	#if 1
+	#if 0
 	//SEGGER_RTT_printf(0,RTT_CTRL_RESET"%s", log);
 
 
@@ -214,13 +229,68 @@ return "tid:24";
 #endif 
 }
 
+#ifdef ELOG_ASYNC_OUTPUT_ENABLE
+void elog_async_output_notice(void) {
+//    osSemaphoreRelease(elog_asyncHandle);
+	xSemaphoreGive(elog_asyncHandle);
+}
+#endif
 
 
+
+#ifdef ELOG_ASYNC_LINE_OUTPUT
+    static char poll_get_buf[ELOG_LINE_BUF_SIZE - 4];
+#else
+    static char poll_get_buf[ELOG_ASYNC_OUTPUT_BUF_SIZE - 4];
+#endif
+
+#ifdef ELOG_ASYNC_OUTPUT_ENABLE
+void elog_entry(void *para) {
+
+    size_t get_log_size = 0;
+
+    for(;;)
+    {
+        /* waiting log */
+        // osSemaphoreAcquire(elog_asyncHandle, osWaitForever);
+
+        osSemaphoreWait(elog_asyncHandle,osWaitForever);
+			
+        /* polling gets and outputs the log */
+        while (1) {
+#ifdef ELOG_ASYNC_LINE_OUTPUT
+            get_log_size = elog_async_get_line_log(poll_get_buf, sizeof(poll_get_buf));
+#else
+            get_log_size = elog_async_get_log(poll_get_buf, sizeof(poll_get_buf));
+#endif
+            if (get_log_size) {
+                elog_port_output(poll_get_buf, get_log_size);
+            } else {
+                break;
+            }
+        }
+    }
+}
+#endif
+
+
+#include "./hook/hook_mem.h"
 /**
  * init easylogger,这个函数是我们自己添加的，便于用户直接调用，需要在elog.h中添加声明
  */
 void easylogger_init(void)
 {
+	
+	
+	#if USE_OS
+	//异步输出应用于RTOS，而同步输出应用于裸机
+	#ifdef ELOG_ASYNC_OUTPUT_ENABLE
+	TaskHandle_t tmp_handle;	
+	BaseType_t xReturn = pdPASS;
+			xTaskCreate(elog_entry,"elog_entry",1024,(void *)0,7,&tmp_handle);				
+			vPrintStack_TaskCreationResult("elog_entry", xReturn, 1024);		
+	#endif
+	#endif
     /* init Easylogger */
 	elog_init();
 
@@ -231,6 +301,13 @@ void easylogger_init(void)
 	elog_set_fmt(ELOG_LVL_INFO, ELOG_FMT_LVL);
 	elog_set_fmt(ELOG_LVL_DEBUG, ELOG_FMT_ALL & ~ELOG_FMT_FUNC);
 
+	
+//	   elog_set_fmt(ELOG_LVL_ASSERT, ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_FUNC | ELOG_FMT_LINE);
+//     elog_set_fmt(ELOG_LVL_ERROR,  ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_FUNC | ELOG_FMT_LINE);
+//     elog_set_fmt(ELOG_LVL_WARN,   ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_FUNC | ELOG_FMT_LINE);
+//     elog_set_fmt(ELOG_LVL_INFO,   ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_FUNC | ELOG_FMT_LINE);
+//     elog_set_fmt(ELOG_LVL_DEBUG,  ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_FUNC | ELOG_FMT_LINE);
+	
 	/*Eenbale color*/
 	elog_set_text_color_enabled(true);
 

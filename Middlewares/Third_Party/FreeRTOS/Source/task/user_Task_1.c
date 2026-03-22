@@ -65,15 +65,15 @@ volatile uint16_t timedelar_T_1_Task;
 //LED1_TOGGLE;
 		Handle_test3();
 				logInfo("T_1_Task:-----\n");
-		SYSTEM_I_PRINT("Task is running, count: %d", count++);
+//		SYSTEM_I_PRINT("Task is running, count: %d", count++);
 		taskYIELD();
-		SYSTEM_D_PRINT("Task is running, count: %d", count++);
-		SYSTEM_D_PRINT("T+++");
+//		SYSTEM_D_PRINT("Task is running, count: %d", count++);
+//		SYSTEM_D_PRINT("T+++");
 //		Check_Usart1_enable();
 //		Check_Usart1_clock_enable();
 		
 //		printf("xxxxxx\r\n");
-		 SYSTEM_DEBUG(" T_1_Task !\r\n");
+//		 SYSTEM_DEBUG(" T_1_Task !\r\n");
     vTaskDelay(timedelar_T_1_Task/portTICK_PERIOD_MS);   /* ÑÓÊ±1000¸öms */
   }
 }
