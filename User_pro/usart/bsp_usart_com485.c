@@ -23,6 +23,9 @@
 
 
 
+// 声明全局执行指针
+UsartSendPtr this_com485_Usart_Send = NULL;
+
 UART_HandleTypeDef huart_COM485_Handle;
 
 
@@ -31,7 +34,7 @@ UART_HandleTypeDef huart_COM485_Handle;
 #if TEST_COM485_UART
 
 #define RX_BUF_LEN 64
-static uint8_t uart_rx_buf[RX_BUF_LEN];  // 多字节接收缓冲区
+//static uint8_t uart_rx_buf[RX_BUF_LEN];  // 多字节接收缓冲区
 static volatile uint8_t index = 0;
 static volatile uint8_t indexsize = 0;
 
@@ -163,7 +166,7 @@ void USART_COM485_ComDrvInit(void)
 	USART_COM485_UartInit();
 USART_COM485_GpioInit();
 	
-	
+	Usart_COM485_send_Config_Init();
 
 }
 
@@ -255,7 +258,26 @@ void USART_COM485_IRQHandler(void)
 //}
 #endif
 
-void Usart_SendArray(UART_HandleTypeDef *huart, uint8_t *array, uint16_t num)
+
+
+
+
+void Usart_COM485_send_Config_Init(void)
+{
+#if USE_COM485_DMA_SEND
+    this_com485_Usart_Send = Usart_COM485_SendArray_DMA;
+#else
+    this_com485_Usart_Send = Usart_COM485_SendArray;
+#endif
+}
+
+
+
+
+
+
+
+void Usart_COM485_SendArray(UART_HandleTypeDef *huart, uint8_t *array, uint16_t num)
 {
     // 直接发送整个数组（阻塞式）
     HAL_UART_Transmit(huart, array, num, HAL_MAX_DELAY);
@@ -264,6 +286,39 @@ void Usart_SendArray(UART_HandleTypeDef *huart, uint8_t *array, uint16_t num)
     while(__HAL_UART_GET_FLAG(huart, UART_FLAG_TC) == RESET);
 }
 
+/**
+ * @brief  使用 DMA 异步发送串口数组
+ * @note   注意：在 H7 系列上，如果开启了 D-Cache，需处理 Cache 一致性
+ */
+void Usart_COM485_SendArray_DMA(UART_HandleTypeDef *huart, uint8_t *array, uint16_t num)
+{
+    // 1. 确保上一次 DMA 发送已经完成
+    // 如果不检查状态直接调用，可能会返回 HAL_BUSY
+    while (huart->gState != HAL_UART_STATE_READY);
+
+    /* 2. 对于 STM32H7 系列（Cortex-M7 内核）：
+       如果 array 位于可缓存的内存区域（如 AXI SRAM），必须先清理缓存，
+       确保 DMA 读取的是内存中最新的数据，而不是 Cache 里的旧数据。*/
+    // SCB_CleanDCache_by_Addr((uint32_t*)array, num); 
+
+    // 3. 开启 DMA 发送
+    if (HAL_UART_Transmit_DMA(huart, array, num) != HAL_OK)
+    {
+        // 错误处理逻辑
+        Error_Handler();
+    }
+}
+
+#if 0
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if(huart->Instance == USART1) // 假设是串口1
+    {
+        // DMA 发送完成后的逻辑
+    }
+}
+
+#endif
 
 
 //static void Test_USART_COM485_print(void){

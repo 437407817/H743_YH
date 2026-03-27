@@ -93,20 +93,28 @@
 //#define DEBUG_USART_COM485_DMA_STREAM            		DMA2_Stream7
 
 
-
+// 定义串口发送函数指针类型
+typedef void (*UsartSendPtr)(UART_HandleTypeDef *, uint8_t *, uint16_t);
 
 #define _485_A_TX_EN()  while(0){}
 #define _485_A_RX_EN() while(0){}
 
 extern UART_HandleTypeDef huart_COM485_Handle;
+extern 	UsartSendPtr this_com485_Usart_Send;
 //#define  huart_COM485  huart_COM485_Handle
 
 //#define USE_UART 1
 #define TEST_COM485_UART 1
 #define USE_COM485_IT_1 1
 
+#define USE_COM485_DMA_SEND 0  // 配置开关：1为DMA模式，0为阻塞模式
 
-
+	
+	
+	
+	
+	
+	
 //void USART_COM485_Config(void);
 
 //void USART_Config_COM485(void);
@@ -126,5 +134,13 @@ void Usart_SendString(uint8_t *str);
 
 void Test_USART_COM485_while(void);
 void Usart_SendArray(UART_HandleTypeDef *huart, uint8_t *array, uint16_t num);
+
+
+void Usart_COM485_SendArray(UART_HandleTypeDef *huart, uint8_t *array, uint16_t num);
+void Usart_COM485_SendArray_DMA(UART_HandleTypeDef *huart, uint8_t *array, uint16_t num);
+
+void Usart_COM485_send_Config_Init(void);
+void reg485ComCb(void (*pFunc)(uint8_t data));
+
 
 #endif /* __BSP_USART_A_H */
