@@ -9,11 +9,10 @@
 #include <stdlib.h>
 #include "./buffer/queue3.h"
  #include "./sys/sysio.h"
-//#include "./middle_business/usart_485_send.h"
-// #include "./communication/Comu485Dis.h"
+
  #include "./usart/bsp_usart_COM485.h"
- #include "./middle_business/usart_485_business.h"
- 
+ #include "./middle_business/usart_485_dataGet.h"
+ #include "./pro_com/usart_485_232_send.h"
  
 /**
 ***********************************************************************
@@ -24,12 +23,12 @@
 #define FRAME_REC_HEAD_0           0x5A  
 #define FRAME_REC_HEAD_1           0xA5
 
-#if c485_CRC16
+#if c485_232_CRC16
 #define PACKET_DATA_LEN_MIN    10                  //最小包长度
-#define PACKET_DATA_LEN_MAX    255                 //最大包长度
+#define PACKET_DATA_LEN_MAX    136                 //最大包长度
 #else
 #define PACKET_DATA_LEN_MIN    10                  //最小包长度
-#define PACKET_DATA_LEN_MAX    255                 //最大包长度
+#define PACKET_DATA_LEN_MAX    120                 //最大包长度
 #endif
 
 
@@ -186,11 +185,11 @@ void Usart485ComTask(void)
 			SYSTEM_ERROR("num count data is not right2,%d ,%d \n",qcp,readBuf[2]);
 			continue;
 		}
-		#if c485_CRC16
+		#if c485_232_CRC16
 //		if (CalCRC16(readBuf, readBuf[2] + 3) != readBuf[readBuf[2] + 3])
 		if (CalCRC16(readBuf, readBuf[2] + 3) != 0)
 		{
-//			SYSTEM_ERROR("CalCRC16 ERROR\n");
+			SYSTEM_ERROR("CalCRC16 ERROR\n");
 			continue;
 		}
 		#endif

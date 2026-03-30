@@ -187,6 +187,8 @@ vPrintStack_TaskCreationResult("shell", xReturn, 256);
 #endif
 
 	#if 1
+	
+	#if 1
   /* 创建LED_Task任务 */
   xReturn = xTaskCreate((TaskFunction_t )T_1_Task, /* 任务入口函数 */
                         (const char*    )"T_1_Task",/* 任务名字 */
@@ -204,6 +206,9 @@ vPrintStack_TaskCreationResult("shell", xReturn, 256);
                         (UBaseType_t    )12, /* 任务的优先级 */
                         (TaskHandle_t*  )&tmp_handle);/* 任务控制块指针 */ 
  vPrintStack_TaskCreationResult("T_2_Task", xReturn, 128);
+	
+#endif
+												
 //		 vPrintHeapState("After T_2_Task Creation");											
 												/* 创建LVGL任务 */
     xTaskCreate((TaskFunction_t )vLvglTask,

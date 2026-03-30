@@ -2,7 +2,7 @@
 #define	__DATA_CONVERT_H
 
 #include "./stm32_FH_xxx_hal.h"
-
+#include <stdint.h>
 
 
 
@@ -20,7 +20,11 @@
 
 
 
-void VpChange16HL(uint16_t* pt,uint16_t num);
+void EndianSwap_VpChange16HL(uint16_t* pt,uint16_t num);
+
+void EndianSwap_VpChange64HL(uint64_t* pt);
+
+void EndianSwap_VpChange64HL_CM7(uint64_t* pt);
 
 
 void StructCopyAndVpReserve(uint8_t *aim_struct,uint8_t *origin_struct,uint8_t stuct_size,uint16_t *aim_struct_fromChange,uint8_t count);

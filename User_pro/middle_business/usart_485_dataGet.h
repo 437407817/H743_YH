@@ -1,5 +1,5 @@
-#ifndef __USART_485_BUSINESS_H
-#define	__USART_485_BUSINESS_H
+#ifndef __USART_485_DATAGET_H
+#define	__USART_485_DATAGET_H
 
 
 #include "./stm32_FH_xxx_hal.h"

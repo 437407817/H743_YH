@@ -15,21 +15,21 @@
 
 
 /************************ USART1 ≈‰÷√£®ÃÊªª‘≠USART6£© ************************/
-#define USART_COM485                             USART6
-#define USART_COM485_CLK_ENABLE()                __USART6_CLK_ENABLE();
+#define USART_COM485                             USART2
+#define USART_COM485_CLK_ENABLE()                __USART2_CLK_ENABLE();
 			  
-#define USART_COM485_RX_GPIO_PORT                GPIOC
-#define USART_COM485_RX_GPIO_CLK_ENABLE()        __GPIOC_CLK_ENABLE()
-#define USART_COM485_RX_PIN                      GPIO_PIN_7
-#define USART_COM485_RX_AF                       GPIO_AF7_USART6
+#define USART_COM485_RX_GPIO_PORT                GPIOD
+#define USART_COM485_RX_GPIO_CLK_ENABLE()        __GPIOD_CLK_ENABLE()
+#define USART_COM485_RX_PIN                      GPIO_PIN_6
+#define USART_COM485_RX_AF                       GPIO_AF7_USART2
 			  
-#define USART_COM485_TX_GPIO_PORT                GPIOC
-#define USART_COM485_TX_GPIO_CLK_ENABLE()        __GPIOC_CLK_ENABLE()
-#define USART_COM485_TX_PIN                      GPIO_PIN_6
-#define USART_COM485_TX_AF                       GPIO_AF7_USART6
+#define USART_COM485_TX_GPIO_PORT                GPIOD
+#define USART_COM485_TX_GPIO_CLK_ENABLE()        __GPIOD_CLK_ENABLE()
+#define USART_COM485_TX_PIN                      GPIO_PIN_5
+#define USART_COM485_TX_AF                       GPIO_AF7_USART2
 			  
-#define USART_COM485_IRQHandler                  USART6_IRQHandler
-#define USART_COM485_IRQ                 		    USART6_IRQn
+#define USART_COM485_IRQHandler                  USART2_IRQHandler
+#define USART_COM485_IRQ                 		    USART2_IRQn
 
 
 
@@ -118,7 +118,7 @@ extern 	UsartSendPtr this_com485_Usart_Send;
 //void USART_COM485_Config(void);
 
 //void USART_Config_COM485(void);
-void USART_COM485_ComDrvInit(void);
+void USART_COM485_232_ComDrvInit(void);
 
 #if TEST_COM485_UART
  #if !(USE_LETTER_COM485)

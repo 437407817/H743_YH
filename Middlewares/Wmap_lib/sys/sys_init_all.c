@@ -91,7 +91,7 @@
 //#include "./touch/touch_drv.h"
 
 #include "./buffer/user_buffers.h"
-
+#include "./usart/bsp_usart_COM485.h"
 
 
 
@@ -120,6 +120,7 @@ DWT_Init();
 	
 	SEGGER_RTT_Init();SYSTEM_INFO("SEGGER_RTT_Init over------------- \n");	
 	USART_Shell_ComDrvInit();SYSTEM_DEBUG("USART_Shell_ComDrvInit over\n");
+	USART_COM485_232_ComDrvInit();
 #if	1
 	#if USE_UART_DMA
 	

@@ -17,13 +17,21 @@
  #include <stdbool.h>
 //#include <elog.h>
 #include "shell.h"
-#define LOG_TAG "SYSTEM"
-#include "elog.h"
+
 #include "stdlib.h"
+#include "./rtosprintf/frtos_printf.h"
 
 
+#define LOG_TAG "OS"
+#include "elog.h"
 
-
+#include "log.h"
+//#define v_printf SYSTEM_i_print
+#if 1
+#define v_printf logInfo
+#else
+#define v_printf log_i
+#endif
 //const char* get_task_state_string(eTaskState state) {
 //    switch (state) {
 //        case eRunning:    return "eRunning";
@@ -54,22 +62,22 @@ int l_pti(uint8_t argc, char **argv)
  TaskStatus_t xTaskDetails;
 	tmp_handle = xTaskGetHandle(argv[1]);
 	if(NULL==tmp_handle){
-	printf("task name is wrong!\r\n");
+	v_printf("task name is wrong!\r\n");
 		return 0;
 	}
 // tmp_handle = xTaskGetHandle("LED1_Task"); 
 	//xTaskGetCurrentTaskHandle();
  vTaskGetInfo(tmp_handle,&xTaskDetails,1,eInvalid);
 	
- taskENTER_CRITICAL(); 
+// taskENTER_CRITICAL(); 
 	 
 // printf("TaskName : %s , TaskNumber = %d , CurrentState = %d , CurrentPriority = %d , BasePriority =  %d , RunTimeCounter = %d ,StackHighWaterMark = %d , TickCount = %d\r\n\r\n",
 //	       xTaskDetails.pcTaskName,(uint16_t)xTaskDetails.xTaskNumber,xTaskDetails.eCurrentState,(uint16_t)xTaskDetails.uxCurrentPriority,
 //	(uint16_t)xTaskDetails.uxBasePriority,xTaskDetails.ulRunTimeCounter,xTaskDetails.usStackHighWaterMark,xTaskGetTickCount());
-  printf("TaskName : %s , TaskNumber = %d , CurrentState = %s , CurrentPriority = %d , BasePriority =  %d , RunTimeCounter = %d ,StackHighWaterMark = %d , TickCount = %d\r\n\r\n",
+  v_printf("TaskName : %s , TaskNumber = %d , CurrentState = %s , CurrentPriority = %d , BasePriority =  %d , RunTimeCounter = %d ,StackHighWaterMark = %d , TickCount = %d\r\n\r\n",
 	       xTaskDetails.pcTaskName,(uint16_t)xTaskDetails.xTaskNumber,task_state_strings[xTaskDetails.eCurrentState],(uint16_t)xTaskDetails.uxCurrentPriority,
 	(uint16_t)xTaskDetails.uxBasePriority,xTaskDetails.ulRunTimeCounter,xTaskDetails.usStackHighWaterMark,xTaskGetTickCount());
- taskEXIT_CRITICAL();  
+// taskEXIT_CRITICAL();  
 	return 0;
 }
 
@@ -80,12 +88,20 @@ SHELL_EXPORT_CMD(SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN), pt
 int l_ptl(uint8_t argc, char **argv)
 {
 	
- char str[200];
- vTaskList(str);
+//  char str[512];//任务多时，需要整大该容量，否则报错
+// vTaskList(str);
 
- taskENTER_CRITICAL();  
- printf("TaskName  State Priority  Stack  Number \r\n%s\r\n",str);
- taskEXIT_CRITICAL(); 
+	char *str = pvPortMalloc(512); // 使用动态内存更安全
+if (str) {
+    vTaskList(str);
+    // 尽量不要在临界区打印大数据量
+    v_printf("TaskName State Priority Stack Number \r\n%s\r\n", str);
+    vPortFree(str);
+}
+
+// taskENTER_CRITICAL();  
+// printf("TaskName  State Priority  Stack  Number \r\n%s\r\n",str);
+// taskEXIT_CRITICAL(); 
 		return 0;
 }
 SHELL_EXPORT_CMD(SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN), ptl, l_ptl, show All Task State);
@@ -97,9 +113,9 @@ SHELL_EXPORT_CMD(SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN), pt
 int l_mem(uint8_t argc, char **argv)
 {
 	
- taskENTER_CRITICAL(); 
- printf("FreeHeapSize = %d   EverFreeHeapSize = %d\r\n",xPortGetFreeHeapSize(),xPortGetMinimumEverFreeHeapSize());
- taskEXIT_CRITICAL();
+// taskENTER_CRITICAL(); 
+ v_printf("FreeHeapSize = %d   EverFreeHeapSize = %d\r\n",xPortGetFreeHeapSize(),xPortGetMinimumEverFreeHeapSize());
+// taskEXIT_CRITICAL();
 		return 0;
 }
 
@@ -110,12 +126,12 @@ SHELL_EXPORT_CMD(SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN), me
 int l_suspend(uint8_t argc, char **argv)
 {
 	 TaskHandle_t tmp_handle;
-	printf("argc:%d\r\n",argc);
+	v_printf("argc:%d\r\n",argc);
 
-	printf("suspend task:%s\r\n",argv[1]);
+	v_printf("suspend task:%s\r\n",argv[1]);
 	tmp_handle=xTaskGetHandle(argv[1]);
 	if(NULL==tmp_handle){
-	printf("task name is wrong!\r\n");
+	v_printf("task name is wrong!\r\n");
 		return 0;
 	}
 	vTaskSuspend(tmp_handle);
@@ -130,10 +146,10 @@ int l_resume(uint8_t argc, char **argv)
 {
 	TaskHandle_t tmp_handle;
 	tmp_handle=xTaskGetHandle(argv[1]);
-	printf("argc:%d\r\n",argc);
-	printf("resume task:%s\r\n",argv[1]);
+	v_printf("argc:%d\r\n",argc);
+	v_printf("resume task:%s\r\n",argv[1]);
 		if(NULL==tmp_handle){
-	printf("task name is wrong!\r\n");
+	v_printf("task name is wrong!\r\n");
 		return 0;
 	}
 	vTaskResume(tmp_handle);
@@ -147,9 +163,9 @@ int l_delete(uint8_t argc, char **argv)
 {
 		TaskHandle_t tmp_handle;
 	tmp_handle=xTaskGetHandle(argv[1]);
-	printf("delete task:%s \r\n",(argv[1]));
+	v_printf("delete task:%s \r\n",(argv[1]));
 	if(NULL==tmp_handle){
-	printf("task name is wrong!\r\n");
+	v_printf("task name is wrong!\r\n");
 		return 0;
 	}
 	vTaskDelete(tmp_handle);
@@ -166,14 +182,14 @@ int l_setpriority(uint8_t argc, char **argv)
 	TaskHandle_t tmp_handle;
 //	configASSERT(isNumericString((&argv[argv[2]])));
 	tmp_handle=xTaskGetHandle(argv[1]);
-	printf("argc:%d\r\n",argc);
-	printf("set task:%s priority:%s\r\n",(argv[1]),(argv[2]));
+	v_printf("argc:%d\r\n",argc);
+	v_printf("set task:%s priority:%s\r\n",(argv[1]),(argv[2]));
 		if(NULL==tmp_handle){
-	printf("task name is wrong!\r\n");
+	v_printf("task name is wrong!\r\n");
 		return 0;
 	}
 				if(0==isNumericString(argv[2])){
-	printf("second param is not num\r\n");
+	v_printf("second param is not num\r\n");
 		return 0;
 	}
 //	vTaskPrioritySet(xTaskGetHandle((argv[1])),(UBaseType_t)stringToInt((argv[2])));
@@ -192,11 +208,11 @@ int l_filterElogLever(uint8_t argc, char **argv)
 {
     int level = 0;
 				if(0==isNumericString(argv[1])){
-	printf("first param is not num\r\n");
+	v_printf("first param is not num\r\n");
 		return 0;
 	}
     level = atoi(argv[1]);
-    printf("set level :%d\r\n",level);
+    v_printf("set level :%d\r\n",level);
     elog_set_filter_lvl(level);
 	return 0;
 }
@@ -210,7 +226,7 @@ int l_fllt(uint8_t argc, char **argv)
 {
 	
     elog_set_filter_tag(argv[1]);
-    printf("set filter tag: %s",argv[1]);
+    v_printf("set filter tag: %s",argv[1]);
 		return 0;
 }
 
@@ -222,7 +238,7 @@ int l_fllt(uint8_t argc, char **argv)
 int l_fllk(uint8_t argc, char **argv)
 {
     elog_set_filter_kw(argv[1]);
-    printf("set filter keyword: %s\r\n",argv[1]);
+    v_printf("set filter keyword: %s\r\n",argv[1]);
 		return 0;
 }
 SHELL_EXPORT_CMD(SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_MAIN), fek, l_fllk, filter Elog Key Word);

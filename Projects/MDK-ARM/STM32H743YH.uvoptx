@@ -1712,7 +1712,7 @@
 
   <Group>
     <GroupName>Third_Party/FreeRTOS</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2020,7 +2020,7 @@
 
   <Group>
     <GroupName>BSP_COMMON_DRIVER</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2588,7 +2588,7 @@
 
   <Group>
     <GroupName>WMAP_lib/convert</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2852,7 +2852,7 @@
 
   <Group>
     <GroupName>WMAP_lib/EastLogger</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2920,7 +2920,7 @@
 
   <Group>
     <GroupName>WMAP_lib/letter_shell</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -7427,18 +7427,6 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\User_pro\communication\Comu485.c</PathWithFileName>
-      <FilenameWithoutPath>Comu485.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>36</GroupNumber>
-      <FileNumber>581</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>..\..\User_pro\usart\bsp_usart_com485.c</PathWithFileName>
       <FilenameWithoutPath>bsp_usart_com485.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -7446,7 +7434,7 @@
     </File>
     <File>
       <GroupNumber>36</GroupNumber>
-      <FileNumber>582</FileNumber>
+      <FileNumber>581</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -7458,7 +7446,7 @@
     </File>
     <File>
       <GroupNumber>36</GroupNumber>
-      <FileNumber>583</FileNumber>
+      <FileNumber>582</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -7470,7 +7458,7 @@
     </File>
     <File>
       <GroupNumber>36</GroupNumber>
-      <FileNumber>584</FileNumber>
+      <FileNumber>583</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -7482,13 +7470,61 @@
     </File>
     <File>
       <GroupNumber>36</GroupNumber>
+      <FileNumber>584</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\User_pro\global\GV_variable.c</PathWithFileName>
+      <FilenameWithoutPath>GV_variable.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>36</GroupNumber>
       <FileNumber>585</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\User_pro\middle_business\usart_485_business.c</PathWithFileName>
-      <FilenameWithoutPath>usart_485_business.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\User_pro\global\GV_enum.c</PathWithFileName>
+      <FilenameWithoutPath>GV_enum.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>36</GroupNumber>
+      <FileNumber>586</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\User_pro\middle_business\usart_485_dataGet.c</PathWithFileName>
+      <FilenameWithoutPath>usart_485_dataGet.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>36</GroupNumber>
+      <FileNumber>587</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\User_pro\middle_business\usart_485_dataMethod.c</PathWithFileName>
+      <FilenameWithoutPath>usart_485_dataMethod.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>36</GroupNumber>
+      <FileNumber>588</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\User_pro\middle_business\usart_485_sendMethod.c</PathWithFileName>
+      <FilenameWithoutPath>usart_485_sendMethod.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

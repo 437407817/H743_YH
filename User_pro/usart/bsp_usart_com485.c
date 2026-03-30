@@ -19,7 +19,7 @@
 #include "./buffer/p_data_queue_outer.h"
 #include "./buffer/que.h"
 #include "./sys/sysio.h"
-
+#include "./pro_com/usart485verify.h"
 
 
 
@@ -133,8 +133,8 @@ void USART_COM485_GpioInit(void)
     USART_COM485_RX_GPIO_CLK_ENABLE();
 
     /* USART1 clock source */
-    RCC_PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1;
-    RCC_PeriphClkInit.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
+    RCC_PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+    RCC_PeriphClkInit.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
     HAL_RCCEx_PeriphCLKConfig(&RCC_PeriphClkInit);
 
     GPIO_InitStruct.Pin = USART_COM485_TX_PIN;
@@ -159,13 +159,16 @@ void USART_COM485_GpioInit(void)
 * @return 
 ***********************************************************
 */
-void USART_COM485_ComDrvInit(void)
+void USART_COM485_232_ComDrvInit(void)
 {
 	
-		
-	USART_COM485_UartInit();
-USART_COM485_GpioInit();
+		Usart485ComAppInit();//如果无此，pProcUartDataFunc(recv_byte);会报错
 	
+	
+	USART_COM485_UartInit();
+
+USART_COM485_GpioInit();
+
 	Usart_COM485_send_Config_Init();
 
 }
@@ -219,7 +222,7 @@ void USART_COM485_IRQHandler(void)
     // 清除RXNE标志（必须！否则中断反复触发）2
     __HAL_UART_CLEAR_FLAG(&huart_COM485_Handle, UART_FLAG_RXNE);
 		    /* 读取接收到的1个字节 */
-    recv_byte = (uint8_t)(huart_COM485_Handle.Instance->TDR);
+    recv_byte = (uint8_t)(huart_COM485_Handle.Instance->RDR);
 		SYSTEM_INFO("+%02x",recv_byte);
 		pProcUartDataFunc(recv_byte);
 //				if (index < RX_BUF_LEN)

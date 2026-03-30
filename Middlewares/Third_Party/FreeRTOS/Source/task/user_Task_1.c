@@ -39,7 +39,8 @@
 #include "./rtosprintf/frtos_printf.h"
 
 
-
+ #define LOG_TAG "TASK"
+#include "elog.h"
 //#include <elog.h>
 
 #include "log.h"
@@ -112,7 +113,7 @@ int changetime(char *pcTaskName,int i)
  TaskStatus_t xTaskDetails;
 	tmp_handle = xTaskGetHandle(pcTaskName);
 	if(NULL==tmp_handle){
-	SYSTEM_I_PRINT("task name is wrong!\r\n");
+	SYSTEM_I_PRINT("task name is wrong! %s\r\n",pcTaskName);
 		return 0;
 	}
 
@@ -128,8 +129,8 @@ int changetime(char *pcTaskName,int i)
 	SYSTEM_I_PRINT("no name \r\n");
 	}
 }
-
-SHELL_EXPORT_CMD(SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC), ct, changetime, test);
+//ct T_1_Task 50000
+SHELL_EXPORT_CMD(SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC), ct, changetime, ct-T_1_Task-50000);
 
 
 

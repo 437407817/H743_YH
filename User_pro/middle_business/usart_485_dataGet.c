@@ -15,14 +15,14 @@
   ******************************************************************************
   */ 
   
-#include "./middle_business/usart_485_business.h"
+#include "./middle_business/usart_485_dataGet.h"
 //#include "./usart/usart485verify.h"
 #include "./pro_com/usart485verify.h"
 #include "./sys/sysio.h"
 //#include "./middle_business/usart_485_address.h"
 //#include "./middle_business/usart_485_driver.h"
-
-
+#include "./global/GV_enum.h" 
+#include "./middle_business/usart_485_dataMethod.h"
 
 
 
@@ -73,6 +73,7 @@ void screendataswitch(uint16_t addr,uint8_t** p_data,uint8_t num){
 SYSTEM_DEBUG_ARRAY_MESSAGE(*p_data,num,"   screen_ADDR =%x ",addr);
 	
 switch(addr){
+	case EM_GET_DATA_ADDRESS: Getdata485_voldata_process(num,p_data); break;//5A A5 05 83 1000 02 0001 0002
 #if 0
 	case EM_S_SetMaintainLimitVoltageComplete_Add: set_setting_Dispose(num,*p_data); break;//点击设置完成 5A A5 06 83 0000 01 0001
 	case EM_S_SetBeginMaintain_Add: set_BeginMaintain_Dispose(num,*p_data); break;//5A A5 06 83 00 04 01 00 00

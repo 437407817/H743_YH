@@ -36,9 +36,9 @@
 
 
 void com_DW_write_cmd(uint16_t addr, uint16_t *buf, uint16_t size);
-void DW_SCREEN_write_cmd_print(uint16_t addr, uint16_t *buf, uint16_t size, uint16_t debugprint);
+void com_DW_write_cmd_print(uint16_t addr, uint16_t *buf, uint16_t size, uint16_t debugprint);
 //void DW_SCREEN_read_cmd(uint16_t addr, uint8_t num);
-void DW_SCREEN_read_cmd_print(uint16_t addr, uint8_t num, uint16_t debugprint);
+void com_DW_read_cmd_print(uint16_t addr, uint8_t num, uint16_t debugprint);
 //void DW_DGUSI_SCREEN_write_Reg_cmd_print(uint8_t REGaddr, uint16_t REGADATA,  uint16_t debugprint);
 
 

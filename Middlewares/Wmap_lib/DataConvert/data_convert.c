@@ -29,7 +29,7 @@
 
 
 
-void VpChange16HL(uint16_t* pt,uint16_t num){
+void EndianSwap_VpChange16HL(uint16_t* pt,uint16_t num){
 	//uint16_t* vp =pt;
 	
 uint16_t count=num/2;
@@ -49,6 +49,29 @@ uint16_t count=num/2;
 //		SYSTEM_DEBUG_ARRAY_MESSAGE((uint8_t*)frame,6," vxcxcxcxc=");
 //	
 //	
+void EndianSwap_VpChange64HL(uint64_t* pt) {
+    if (pt == NULL) return;
+    
+    uint64_t val = *pt;
+    val = ((val & 0xFF00000000000000ULL) >> 56) |
+          ((val & 0x00FF000000000000ULL) >> 40) |
+          ((val & 0x0000FF0000000000ULL) >> 24) |
+          ((val & 0x000000FF00000000ULL) >> 8)  |
+          ((val & 0x00000000FF000000ULL) << 8)  |
+          ((val & 0x0000000000FF0000ULL) << 24) |
+          ((val & 0x000000000000FF00ULL) << 40) |
+          ((val & 0x00000000000000FFULL) << 56);
+    *pt = val;
+}
+
+
+
+
+void EndianSwap_VpChange64HL_CM7(uint64_t* pt) {
+    if (pt == NULL) return;
+    // 使用编译器内置函数，直接映射到硬件 REV 指令
+    *pt = __builtin_bswap64(*pt);
+}
 
 
 
@@ -57,7 +80,7 @@ void StructCopyAndVpReserve(uint8_t *aim_struct,uint8_t *origin_struct,uint8_t s
 	
 	memmove(&*aim_struct,&*origin_struct,stuct_size);
 	
-	VpChange16HL((uint16_t *)aim_struct_fromChange,count);
+	EndianSwap_VpChange16HL((uint16_t *)aim_struct_fromChange,count);
 	
 	
  //VpChange16HL(BigD_GV_CommSlaveBoardState.StopParalleltChargeVol,16*12);
@@ -80,7 +103,7 @@ void StructOnlyVpReserve(uint8_t *aim_struct_fromChange,uint8_t count){
 
 	
 	
-	VpChange16HL((uint16_t *)aim_struct_fromChange,count);
+	EndianSwap_VpChange16HL((uint16_t *)aim_struct_fromChange,count);
 	
 	
 }

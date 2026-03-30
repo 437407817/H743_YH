@@ -119,7 +119,7 @@ free(frame);
 
 
 //单片机是小端数据模式，该函数会自动转化成大端模式后发送
-void DW_SCREEN_write_cmd_print(uint16_t addr, uint16_t *buf, uint16_t size, uint16_t debugprint) {      //82
+void com_DW_write_cmd_print(uint16_t addr, uint16_t *buf, uint16_t size, uint16_t debugprint) {      //82
 
 	uint8_t *frame = NULL;
 	#if (DW_CRC16==1)	
@@ -196,7 +196,7 @@ free(frame);
 
 
 
-void DW_SCREEN_read_cmd_print(uint16_t addr, uint8_t num, uint16_t debugprint) {      //83
+void com_DW_read_cmd_print(uint16_t addr, uint8_t num, uint16_t debugprint) {      //83
 
 	uint8_t *frame = NULL;
 	#if (DW_CRC16==1)	
