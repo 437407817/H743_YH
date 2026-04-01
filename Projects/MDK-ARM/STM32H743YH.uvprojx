@@ -5217,6 +5217,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\Middlewares\Third_Party\LVGL\GUI_APP\ui\components\ui_comp_hook.c</FilePath>
             </File>
+            <File>
+              <FileName>ui_S_page01.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Middlewares\Third_Party\LVGL\GUI_APP\ui\screens\ui_S_page01.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_S_page02.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Middlewares\Third_Party\LVGL\GUI_APP\ui\screens\ui_S_page02.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
